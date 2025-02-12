@@ -1,3 +1,5 @@
+import { Gameboard } from '@/types/gameboard';
+
 export enum BackgroundColor {
   PINK = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-pink-500 tile',
   CYAN = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-cyan-500 tile',
@@ -7,8 +9,46 @@ export enum BackgroundColor {
   GRAY = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-gray-500 tile',
 }
 
-export const getRandomBackgroundColor = () => {
+export const getRandomBackgroundColor = (
+  col: number,
+  row: number,
+  matrix: Gameboard
+) => {
   const keys = Object.keys(BackgroundColor);
-  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  let randomKey;
+  do {
+    randomKey = keys[
+      Math.floor(Math.random() * keys.length)
+    ] as keyof typeof BackgroundColor;
+  } while (
+    prevTwoColorsInColumnSame(col, row, matrix, randomKey) ||
+    prevTwoColorsinRowSame(col, row, matrix, randomKey)
+  );
   return randomKey;
+};
+
+const prevTwoColorsInColumnSame = (
+  col: number,
+  row: number,
+  matrix: Gameboard,
+  color: keyof typeof BackgroundColor
+) => {
+  if (row < 2) return false;
+  return (
+    (color === matrix[col][row - 1].color && matrix[col][row - 1].color) ===
+    matrix[col][row - 2].color
+  );
+};
+
+const prevTwoColorsinRowSame = (
+  col: number,
+  row: number,
+  matrix: Gameboard,
+  color: keyof typeof BackgroundColor
+) => {
+  if (col < 2) return false;
+  return (
+    (color === matrix[col - 1][row].color && matrix[col - 1][row].color) ===
+    matrix[col - 2][row].color
+  );
 };
