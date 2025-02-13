@@ -5,6 +5,12 @@ export type Tile = {
   row: number;
   col: number;
   selected: boolean;
+  highlighted: boolean;
+};
+
+export type TilePosition = {
+  col: number;
+  row: number;
 };
 
 export type Gameboard = Tile[][];

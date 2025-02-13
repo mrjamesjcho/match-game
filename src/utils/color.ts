@@ -5,7 +5,7 @@ export enum BackgroundColor {
   CYAN = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-cyan-500 tile',
   BLUE = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-blue-500 tile',
   GREEN = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-green-500 tile',
-  YELLOW = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-yellow-500 tile',
+  // YELLOW = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-yellow-500 tile',
   PURPLE = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-purple-500 tile',
 }
 
@@ -16,6 +16,15 @@ export enum ClickedClassname {
   GREEN = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-green-500',
   YELLOW = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-yellow-500',
   PURPLE = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-purple-500',
+}
+
+export enum HighlightedClassname {
+  PINK = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-pink-500',
+  CYAN = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-cyan-500',
+  BLUE = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-blue-500',
+  GREEN = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-green-500',
+  YELLOW = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-yellow-500',
+  PURPLE = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-purple-500',
 }
 
 export const getRandomBackgroundColor = (

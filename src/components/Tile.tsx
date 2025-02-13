@@ -1,13 +1,19 @@
 'use client';
 
-import { BackgroundColor, ClickedClassname } from '@/utils/color';
+import {
+  BackgroundColor,
+  ClickedClassname,
+  HighlightedClassname,
+} from '@/utils/color';
 
 interface TileProps {
   col: number;
   row: number;
   color: string;
   selected: boolean;
+  highlighted: boolean;
   onSelect: (col: number, row: number) => void;
+  onHighlightedSelect: (col: number, row: number) => void;
 }
 
 export default function Tile({
@@ -15,23 +21,34 @@ export default function Tile({
   row,
   color,
   selected,
+  highlighted,
   onSelect,
+  onHighlightedSelect,
 }: TileProps) {
   const handleClick = () => {
-    console.log('clicked');
     if (selected) return;
     onSelect(col, row);
+  };
+
+  const handleHighlightedClick = () => {
+    onHighlightedSelect(col, row);
+  };
+
+  const getClassName = () => {
+    if (selected)
+      return ClickedClassname[color as keyof typeof ClickedClassname];
+
+    if (highlighted)
+      return HighlightedClassname[color as keyof typeof HighlightedClassname];
+
+    return BackgroundColor[color as keyof typeof BackgroundColor];
   };
 
   return (
     <div
       key={`${col}-${row}`}
-      className={
-        selected
-          ? ClickedClassname[color as keyof typeof ClickedClassname]
-          : BackgroundColor[color as keyof typeof BackgroundColor]
-      }
-      onClick={handleClick}
+      className={getClassName()}
+      onClick={highlighted ? handleHighlightedClick : handleClick}
     >{`${col}-${row}`}</div>
   );
 }
