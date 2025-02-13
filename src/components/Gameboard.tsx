@@ -9,8 +9,11 @@ import type { Gameboard, Tile } from '@/types/gameboard';
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
 export default function Gameboard() {
-  const [matrix, setMatrix] = useState<Gameboard>();
-  const [selectedTile, setSelectedTile] = useState({ col: -1, row: -1 });
+  const [matrix, setMatrix] = useState<Gameboard>([]);
+  const [selectedTile, setSelectedTile] = useState<{
+    col: number;
+    row: number;
+  } | null>(null);
 
   useEffect(() => {
     const newMatrix = Array.from(
@@ -23,37 +26,45 @@ export default function Gameboard() {
           col: idx,
           row,
           color: getRandomBackgroundColor(idx, row, newMatrix),
+          selected: false,
         });
       }
     });
     setMatrix(newMatrix);
   }, []);
 
-  const onTileSelect = (col: number, row: number) => {
-    setSelectedTile({ col, row });
-    console.log('selectedTile', { col, row });
+  const onTileSelect = (selectedCol: number, selectedRow: number) => {
+    const newMatrix = matrix.map((col, colIdx) =>
+      selectedCol === colIdx
+        ? col.map((tile, rowIdx) =>
+            selectedRow === rowIdx ? { ...tile, selected: true } : tile
+          )
+        : col
+    );
+    if (selectedTile) {
+      newMatrix[selectedTile.col][selectedTile.row].selected = false;
+    }
+    setMatrix(newMatrix);
+    setSelectedTile({ col: selectedCol, row: selectedRow });
   };
 
-  const renderMatrix = () =>
-    matrix?.map((col: Tile[], idx: number) => (
-      <div key={`col-${idx}`} className="grid grid-rows-8 gap-2">
-        {col.map((cell, row) => (
-          <Tile
-            key={`${col}-${row}`}
-            col={idx}
-            row={row}
-            color={cell.color}
-            onSelect={onTileSelect}
-          />
-        ))}
-      </div>
-    ));
-
-  if (!matrix?.length) return null;
   return (
     <div className="flex w-full h-screen items-center justify-center">
       <div className="border p-2 flex items-center justify-center grid grid-cols-8 gap-2 min-w-[394px] min-h-[394px]">
-        {renderMatrix()}
+        {matrix?.map((col: Tile[], idx: number) => (
+          <div key={`col-${idx}`} className="grid grid-rows-8 gap-2">
+            {col.map((cell, row) => (
+              <Tile
+                key={`${col}-${row}`}
+                col={idx}
+                row={row}
+                color={cell.color}
+                selected={cell.selected}
+                onSelect={onTileSelect}
+              />
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

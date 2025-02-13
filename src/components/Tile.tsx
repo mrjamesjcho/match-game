@@ -1,21 +1,25 @@
 'use client';
 
 import { BackgroundColor, ClickedClassname } from '@/utils/color';
-import { useState } from 'react';
 
 interface TileProps {
   col: number;
   row: number;
   color: string;
+  selected: boolean;
   onSelect: (col: number, row: number) => void;
 }
 
-export default function Tile({ col, row, color, onSelect }: TileProps) {
-  const [clicked, setClicked] = useState(false);
-
+export default function Tile({
+  col,
+  row,
+  color,
+  selected,
+  onSelect,
+}: TileProps) {
   const handleClick = () => {
     console.log('clicked');
-    setClicked(!clicked);
+    if (selected) return;
     onSelect(col, row);
   };
 
@@ -23,7 +27,7 @@ export default function Tile({ col, row, color, onSelect }: TileProps) {
     <div
       key={`${col}-${row}`}
       className={
-        clicked
+        selected
           ? ClickedClassname[color as keyof typeof ClickedClassname]
           : BackgroundColor[color as keyof typeof BackgroundColor]
       }
