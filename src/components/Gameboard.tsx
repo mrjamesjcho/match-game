@@ -56,14 +56,27 @@ export default function Gameboard() {
 
   const handleTileSelect = (selectedCol: number, selectedRow: number) => {
     const newMatrix = matrix.map((col, colIdx) =>
-      selectedCol === colIdx
+      colIdx === selectedCol
         ? col.map((tile, rowIdx) =>
-            selectedRow === rowIdx ? { ...tile, selected: true } : tile
+            rowIdx === selectedRow
+              ? { ...tile, selected: !tile.selected }
+              : tile
           )
         : col
     );
-    if (selectedTile) {
-      newMatrix[selectedTile.col][selectedTile.row].selected = false;
+    let newSelectedTile: TilePosition | null = {
+      col: selectedCol,
+      row: selectedRow,
+    };
+
+    if (
+      selectedTile?.col === selectedCol &&
+      selectedTile?.row === selectedRow
+    ) {
+      // if user selected the same tile again, deselect it
+      newSelectedTile = null;
+    } else if (selectedTile) {
+      // if user selected a different tile, deselect the previously selected tile
       addOrRemoveHighlightedTilesAroundSelected(
         selectedTile?.col,
         selectedTile?.row,
@@ -76,7 +89,7 @@ export default function Gameboard() {
       newMatrix
     );
     setMatrix(newMatrix);
-    setSelectedTile({ col: selectedCol, row: selectedRow });
+    setSelectedTile(newSelectedTile);
   };
 
   // checks if there will be 3 or more tiles connected in the same row to the selected tile
@@ -86,7 +99,8 @@ export default function Gameboard() {
     highlightedRow: number
   ) => {
     if (!selectedTile) return false;
-    const color = matrix[selectedTile.col][selectedTile.row].color;
+    // check if there are 3 or more tiles connected in the same row to the selected tile in the highlighted tile's position
+    let color = matrix[selectedTile.col][selectedTile.row].color;
     let count = 1;
     let colLeft = highlightedCol - 1;
     let leftComplete = false;
@@ -114,6 +128,37 @@ export default function Gameboard() {
         rightComplete = true;
       }
     } while (!leftComplete || !rightComplete);
+    if (count >= 3) return true;
+
+    // check if there are 3 or more tiles connected in the same row to the highlighted tile in the selected tile's position
+    color = matrix[highlightedCol][highlightedRow].color;
+    count = 1;
+    colLeft = selectedTile.col - 1;
+    leftComplete = false;
+    colRight = selectedTile.col + 1;
+    rightComplete = false;
+    do {
+      if (
+        colLeft >= 0 &&
+        matrix[colLeft][selectedTile.row].color === color &&
+        (colLeft !== highlightedCol || highlightedRow !== selectedTile.row)
+      ) {
+        count++;
+        colLeft--;
+      } else {
+        leftComplete = true;
+      }
+      if (
+        colRight < NUMBER_OF_COLS &&
+        matrix[colRight][selectedTile.row].color === color &&
+        (colRight !== highlightedCol || highlightedRow !== selectedTile.row)
+      ) {
+        count++;
+        colRight++;
+      } else {
+        rightComplete = true;
+      }
+    } while (!leftComplete || !rightComplete);
     return count >= 3;
   };
 
@@ -125,7 +170,7 @@ export default function Gameboard() {
   ) => {
     if (!selectedTile) return false;
     console.log('matrix', matrix);
-    const color = matrix[selectedTile.col][selectedTile.row].color;
+    let color = matrix[selectedTile.col][selectedTile.row].color;
     let count = 1;
     let rowTop = highlightedRow - 1;
     let topComplete = false;
@@ -152,6 +197,41 @@ export default function Gameboard() {
       } else {
         bottomComplete = true;
       }
+    } while (!topComplete || !bottomComplete);
+    if (count >= 3) return true;
+
+    // check if there are 3 or more tiles connected in the same row to the highlighted tile in the selected tile's position
+    color = matrix[highlightedCol][highlightedRow].color;
+    count = 1;
+    rowTop = selectedTile.row - 1;
+    topComplete = false;
+    rowBottom = selectedTile.row + 1;
+    bottomComplete = false;
+    do {
+      console.log('rowTop', rowTop);
+      if (
+        rowTop >= 0 &&
+        matrix[selectedTile.col][rowTop].color === color &&
+        (selectedTile.col !== highlightedCol || rowTop !== highlightedRow)
+      ) {
+        count++;
+        rowTop--;
+      } else {
+        topComplete = true;
+      }
+      console.log('count after top', count);
+      console.log('rowBottom', rowBottom);
+      if (
+        rowBottom < NUMBER_OF_ROWS &&
+        matrix[selectedTile.col][rowBottom].color === color &&
+        (selectedTile.col !== highlightedCol || rowBottom !== highlightedRow)
+      ) {
+        count++;
+        rowBottom++;
+      } else {
+        bottomComplete = true;
+      }
+      console.log('count after bottom', count);
     } while (!topComplete || !bottomComplete);
     return count >= 3;
   };

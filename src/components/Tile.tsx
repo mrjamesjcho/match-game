@@ -26,7 +26,6 @@ export default function Tile({
   onHighlightedSelect,
 }: TileProps) {
   const handleClick = () => {
-    if (selected) return;
     onSelect(col, row);
   };
 
