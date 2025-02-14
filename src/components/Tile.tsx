@@ -3,6 +3,7 @@
 import {
   BackgroundColor,
   ClickedClassname,
+  DeletedClassname,
   HighlightedClassname,
 } from '@/utils/color';
 
@@ -12,6 +13,7 @@ interface TileProps {
   color: string;
   selected: boolean;
   highlighted: boolean;
+  deleted: boolean;
   onSelect: (col: number, row: number) => void;
   onHighlightedSelect: (col: number, row: number) => void;
 }
@@ -22,6 +24,7 @@ export default function Tile({
   color,
   selected,
   highlighted,
+  deleted,
   onSelect,
   onHighlightedSelect,
 }: TileProps) {
@@ -39,6 +42,9 @@ export default function Tile({
 
     if (highlighted)
       return HighlightedClassname[color as keyof typeof HighlightedClassname];
+
+    if (deleted)
+      return DeletedClassname[color as keyof typeof DeletedClassname];
 
     return BackgroundColor[color as keyof typeof BackgroundColor];
   };

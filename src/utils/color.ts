@@ -27,6 +27,15 @@ export enum HighlightedClassname {
   PURPLE = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-purple-500',
 }
 
+export enum DeletedClassname {
+  PINK = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-pink-500',
+  CYAN = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-cyan-500',
+  BLUE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-blue-500',
+  GREEN = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-green-500',
+  YELLOW = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-yellow-500',
+  PURPLE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-purple-500',
+}
+
 export const getRandomBackgroundColor = (
   col: number,
   row: number,
