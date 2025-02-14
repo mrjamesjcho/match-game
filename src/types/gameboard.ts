@@ -6,6 +6,7 @@ export type Tile = {
   col: number;
   selected: boolean;
   highlighted: boolean;
+  deleted: boolean;
 };
 
 export type TilePosition = {
