@@ -4,6 +4,7 @@ import {
   BackgroundColor,
   ClickedClassname,
   DeletedClassname,
+  DeleteTransitionClassname,
   HighlightedClassname,
 } from '@/utils/color';
 
@@ -14,6 +15,7 @@ interface TileProps {
   selected: boolean;
   highlighted: boolean;
   deleted: boolean;
+  deleteTransition: boolean;
   onSelect: (col: number, row: number) => void;
   onHighlightedSelect: (col: number, row: number) => void;
 }
@@ -25,10 +27,12 @@ export default function Tile({
   selected,
   highlighted,
   deleted,
+  deleteTransition,
   onSelect,
   onHighlightedSelect,
 }: TileProps) {
   const handleClick = () => {
+    if (deleteTransition) return;
     onSelect(col, row);
   };
 
@@ -43,9 +47,9 @@ export default function Tile({
     if (highlighted)
       return HighlightedClassname[color as keyof typeof HighlightedClassname];
 
-    if (deleted)
-      return DeletedClassname[color as keyof typeof DeletedClassname];
-
+    if (deleted && deleteTransition) {
+      return DeleteTransitionClassname[color as keyof typeof DeletedClassname];
+    }
     return BackgroundColor[color as keyof typeof BackgroundColor];
   };
 
