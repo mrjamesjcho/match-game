@@ -11,8 +11,16 @@ const Tile = dynamic(() => import('./Tile'), { ssr: false });
 export default function Gameboard() {
   const [matrix, setMatrix] = useState<Gameboard>([]);
   const [selectedTile, setSelectedTile] = useState<TilePosition | null>(null);
-  const [swapTile, setSwapTile] = useState<TilePosition | null>(null);
   const [tilesToDelete, setTilesToDelete] = useState<TilePosition[]>([]);
+  const [deleteTransition, setDeleteTransition] = useState(false);
+  // user selects a tile
+  // user selects a highlighted tile
+  // check for 3 or more matching tiles in the same row or column
+  // if matching tiles, swap the selected tile with the highlighted tile
+  // if no matching tiles, deselect the selected tile
+  // update matching tiles to be deleted
+  // update the gameboard
+  // transition the deleted tiles
 
   useEffect(() => {
     const newMatrix = Array.from(
@@ -57,7 +65,10 @@ export default function Gameboard() {
     }
   };
 
+  // when user selects a tile, highlight the tiles around the selected tile
+  // if user selects the same tile again, deselect it and restore the highlighted tiles
   const handleTileSelect = (selectedCol: number, selectedRow: number) => {
+    // update selected attribute of the selected tile
     const newMatrix = matrix.map((col, colIdx) =>
       colIdx === selectedCol
         ? col.map((tile, rowIdx) =>
@@ -79,7 +90,8 @@ export default function Gameboard() {
       // if user selected the same tile again, deselect it
       newSelectedTile = null;
     } else if (selectedTile) {
-      // if user selected a different tile, deselect the previously selected tile
+      // if user selected a different tile
+      // deselect the previously selected tile and restore the highlighted tiles
       addOrRemoveHighlightedTilesAroundSelected(
         selectedTile?.col,
         selectedTile?.row,
@@ -87,6 +99,7 @@ export default function Gameboard() {
       );
       newMatrix[selectedTile.col][selectedTile.row].selected = false;
     }
+    // highlight the tiles around the selected tile and update gameboard
     addOrRemoveHighlightedTilesAroundSelected(
       selectedCol,
       selectedRow,
@@ -257,7 +270,7 @@ export default function Gameboard() {
     return [...tilesToDelete, ...matchedTiles1, ...matchedTiles2];
   };
 
-  const threeOrMoreMatchingTilesInSameColumnOrRow = (
+  const tilesWithThreeOrMoreMatchingTilesInSameColumnOrRow = (
     highlightedCol: number,
     highlightedRow: number
   ) => {
@@ -269,49 +282,104 @@ export default function Gameboard() {
       highlightedCol,
       highlightedRow
     );
-    setTilesToDelete([...matchingTilesInSameColumn, ...matchingTilesInSameRow]);
-    return matchingTilesInSameRow.length || matchingTilesInSameColumn.length;
+    return [...matchingTilesInSameColumn, ...matchingTilesInSameRow];
   };
 
+  const swapSelectedTileWithHighlightedTile = async (
+    highlightedCol: number,
+    highlightedRow: number
+  ) => {
+    if (!selectedTile) return;
+    const newMatrix = matrix.map((col, colIdx) => {
+      let newCol; // column with updated tiles
+
+      // update the highlighted tile with the color of the selected tile
+      // and remove the highlighted attribute
+      if (colIdx === highlightedCol) {
+        newCol = col.map((tile, rowIdx) =>
+          rowIdx === highlightedRow
+            ? {
+                ...tile,
+                color: matrix[selectedTile.col][selectedTile.row].color,
+                highlighted: false,
+              }
+            : tile
+        );
+      }
+
+      if (colIdx === selectedTile.col) {
+        newCol = (newCol ?? col).map((tile, rowIdx) => {
+          // update the selected tile with the color of the highlighted tile
+          if (rowIdx === selectedTile.row) {
+            return {
+              ...tile,
+              color: matrix[highlightedCol][highlightedRow].color,
+              selected: false,
+            };
+          }
+
+          // restore highlighted tiles in the same column of the selected tile
+          if (rowIdx === selectedTile.row + 1) {
+            return {
+              ...tile,
+              highlighted: false,
+            };
+          }
+          if (rowIdx === selectedTile.row - 1) {
+            return {
+              ...tile,
+              highlighted: false,
+            };
+          }
+          return tile;
+        });
+      }
+
+      // restore highlighted tiles in the same row as the selected tile
+      if (colIdx === selectedTile.col - 1) {
+        newCol = (newCol ?? col).map((tile, rowIdx) =>
+          rowIdx === selectedTile.row ? { ...tile, highlighted: false } : tile
+        );
+      }
+      if (colIdx === selectedTile.col + 1) {
+        newCol = (newCol ?? col).map((tile, rowIdx) =>
+          rowIdx === selectedTile.row ? { ...tile, highlighted: false } : tile
+        );
+      }
+      return newCol ?? col;
+    });
+    setMatrix(newMatrix);
+  };
+
+  const handleHighlightedTileSelect = async (
+    highlightedCol: number,
+    highlightedRow: number
+  ) => {
+    // check if there are 3 or more matching tiles in the same row or column
+    // if the selected tile moves to the highlighted tile's position
+    // if there are, swap the selected tile with the highlighted tile
+    const tilesToDelete = tilesWithThreeOrMoreMatchingTilesInSameColumnOrRow(
+      highlightedCol,
+      highlightedRow
+    );
+    if (tilesToDelete.length) {
+      console.log('three or more matching tiles in the same row or column');
+      await swapSelectedTileWithHighlightedTile(highlightedCol, highlightedRow);
+      setSelectedTile(null);
+      setTilesToDelete(tilesToDelete);
+    } else {
+      console.log(
+        'No three or more highlighted tiles in the same row or column'
+      );
+    }
+  };
+
+  // update the gameboard with the tiles to be deleted
   useEffect(() => {
-    if (tilesToDelete.length && swapTile && selectedTile) {
+    if (tilesToDelete.length) {
       const newMatrix = matrix.map((col, colIdx) => {
-        let newCol;
-        // swap the selected tile with the highlighted tile
-        if (colIdx === swapTile.col) {
-          newCol = col.map((tile, rowIdx) =>
-            rowIdx === swapTile.row
-              ? {
-                  ...tile,
-                  color: matrix[selectedTile.col][selectedTile.row].color,
-                  selected: false,
-                }
-              : tile
-          );
-        }
-        if (colIdx === selectedTile.col) {
-          newCol = (newCol ?? col).map((tile, rowIdx) => {
-            if (rowIdx === selectedTile.row) {
-              return {
-                ...tile,
-                color: matrix[swapTile.col][swapTile.row].color,
-                selected: false,
-              };
-            } else if (rowIdx === selectedTile.row + 1) {
-              return {
-                ...tile,
-                highlighted: false,
-              };
-            } else if (rowIdx === selectedTile.row - 1) {
-              return {
-                ...tile,
-                highlighted: false,
-              };
-            }
-            return tile;
-          });
-        }
         // update the tiles to be deleted
+        let newCol;
         if (tilesToDelete.find((tile) => tile.col === colIdx)) {
           newCol = (newCol ?? col).map((tile, rowIdx) => {
             if (
@@ -327,42 +395,22 @@ export default function Gameboard() {
             return tile;
           });
         }
-        // remove the highlighted tiles
-        if (colIdx === selectedTile.col + 1) {
-          newCol = (newCol ?? col).map((tile, rowIdx) =>
-            rowIdx === selectedTile.row ? { ...tile, highlighted: false } : tile
-          );
-        }
-        if (colIdx === selectedTile.col - 1) {
-          newCol = (newCol ?? col).map((tile, rowIdx) =>
-            rowIdx === selectedTile.row ? { ...tile, highlighted: false } : tile
-          );
-        }
         return newCol || col;
       });
-      setSelectedTile(null);
-      setSwapTile(null);
       setTilesToDelete([]);
       setMatrix(newMatrix);
-      console.log('newMatrix', newMatrix);
     }
-  }, [tilesToDelete, swapTile, selectedTile, matrix]);
+  }, [matrix, tilesToDelete]);
 
-  const handleHighlightedTileSelect = (
-    highlightedCol: number,
-    highlightedRow: number
-  ) => {
-    if (
-      threeOrMoreMatchingTilesInSameColumnOrRow(highlightedCol, highlightedRow)
-    ) {
-      console.log('three or more highlighted tiles in the same row or column');
-      setSwapTile({ col: highlightedCol, row: highlightedRow });
-    } else {
-      console.log(
-        'No three or more highlighted tiles in the same row or column'
-      );
+  // transition the deleted tiles
+  useEffect(() => {
+    if (!tilesToDelete.length) {
+      setDeleteTransition(true);
+      setTimeout(() => {
+        setDeleteTransition(false);
+      }, 2000);
     }
-  };
+  }, [tilesToDelete]);
 
   return (
     <div className="flex w-full h-screen items-center justify-center">
@@ -380,6 +428,7 @@ export default function Gameboard() {
                 onSelect={handleTileSelect}
                 onHighlightedSelect={handleHighlightedTileSelect}
                 deleted={cell.deleted}
+                deleteTransition={deleteTransition}
               />
             ))}
           </div>
