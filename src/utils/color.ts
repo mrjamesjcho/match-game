@@ -36,6 +36,15 @@ export enum DeletedClassname {
   PURPLE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-purple-500',
 }
 
+export enum DeleteTransitionClassname {
+  PINK = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-pink-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  CYAN = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-cyan-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  BLUE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-blue-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  GREEN = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-green-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  YELLOW = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-yellow-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  PURPLE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-purple-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+}
+
 export const getRandomBackgroundColor = (
   col: number,
   row: number,
