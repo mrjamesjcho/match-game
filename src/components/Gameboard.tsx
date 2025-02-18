@@ -14,17 +14,11 @@ const Tile = dynamic(() => import('./Tile'), { ssr: false });
 export default function Gameboard() {
   const [matrix, setMatrix] = useState<Gameboard>([]);
   const [selectedTile, setSelectedTile] = useState<TilePosition | null>(null);
+  const [preventClicks, setPreventClicks] = useState(false);
   const [tilesToDelete, setTilesToDelete] = useState<TilePosition[]>([]);
-  const [addNewTiles, setAddNewTiles] = useState(false);
+  const [newTilesAdded, setNewTilesAdded] = useState(false);
+  const [scaleDeletedTiles, setScaleDeletedTiles] = useState(false);
   const [collapseDeletedTiles, setCollapseDeletedTiles] = useState(false);
-  // user selects a tile
-  // user selects a highlighted tile
-  // check for 3 or more matching tiles in the same row or column
-  // if matching tiles, swap the selected tile with the highlighted tile
-  // if no matching tiles, deselect the selected tile
-  // update matching tiles to be deleted
-  // update the gameboard
-  // transition the deleted tiles
 
   useEffect(() => {
     const newMatrix = Array.from(
@@ -376,6 +370,7 @@ export default function Gameboard() {
     // check if there are 3 or more matching tiles in the same row or column
     // if the selected tile moves to the highlighted tile's position
     // if there are, swap the selected tile with the highlighted tile
+    setPreventClicks(true);
     const tilesToDelete = tilesWithThreeOrMoreMatchingTilesInSameColumnOrRow(
       highlightedCol,
       highlightedRow
@@ -389,15 +384,16 @@ export default function Gameboard() {
       console.log(
         'No three or more highlighted tiles in the same row or column'
       );
+      setPreventClicks(false);
     }
   };
 
-  // update the gameboard with the tiles to be deleted
+  // update the gameboard by marking the tiles to be deleted
+  // and adding new tiles to the columns with deleted tiles
   useEffect(() => {
-    console.log('tiles to delete', tilesToDelete);
     if (tilesToDelete.length) {
+      // mark tiles to be deleted
       let newMatrix = matrix.map((col, colIdx) => {
-        // update the tiles to be deleted
         let newCol;
         if (tilesToDelete.find((tile) => tile.col === colIdx)) {
           newCol = (newCol ?? col).map((tile, rowIdx) => {
@@ -416,6 +412,8 @@ export default function Gameboard() {
         }
         return newCol || col;
       });
+
+      // add new tiles to the columns with deleted tiles
       newMatrix = newMatrix.map((col, colIdx) => {
         if (col.find((tile) => tile.deleted)) {
           let tilesRemoved = 0;
@@ -454,33 +452,41 @@ export default function Gameboard() {
       });
       setTilesToDelete([]);
       setMatrix(newMatrix);
-      setTimeout(() => {
-        setAddNewTiles(true);
-      }, 1000);
+      setNewTilesAdded(true);
     }
   }, [matrix, tilesToDelete]);
 
-  // transition the deleted tiles
+  // transition the deleted tiles to scale to 0
   useEffect(() => {
-    console.log('add new tiles', addNewTiles);
-    if (addNewTiles) {
+    if (newTilesAdded) {
+      setNewTilesAdded(false);
+      setScaleDeletedTiles(true);
+    }
+  }, [newTilesAdded]);
+
+  // transition the deleted tiles to collapse
+  useEffect(() => {
+    if (scaleDeletedTiles) {
       setTimeout(() => {
-        setAddNewTiles(false);
+        setScaleDeletedTiles(false);
         setCollapseDeletedTiles(true);
-      }, 2000);
+      }, 1000);
     }
-  }, [matrix, addNewTiles]);
+  }, [scaleDeletedTiles]);
 
+  // remove the deleted tiles from the gameboard
   useEffect(() => {
-    console.log('remove deleted tiles from gameboard', collapseDeletedTiles);
     if (collapseDeletedTiles) {
+      setTimeout(() => {
+        setCollapseDeletedTiles(false);
+        const newMatrix = matrix.map((col) =>
+          col.filter((tile) => !tile.deleted)
+        );
+        setMatrix(newMatrix);
+        setPreventClicks(false);
+      }, 1000);
     }
-  }, [collapseDeletedTiles]);
-
-  // transition and remove deleted tiles
-  // append new tiles to the top of the columns
-  // update the deleted tiles to transition to a scale of 0
-  // remove deleted tiles from the gameboard
+  }, [collapseDeletedTiles, matrix]);
 
   return (
     <div className="flex w-full h-screen items-center justify-center">
@@ -501,8 +507,9 @@ export default function Gameboard() {
                 onSelect={handleTileSelect}
                 onHighlightedSelect={handleHighlightedTileSelect}
                 deleted={cell.deleted}
-                deletedScale={addNewTiles}
+                deletedScale={scaleDeletedTiles}
                 deletedCollapse={collapseDeletedTiles}
+                preventClicks={preventClicks}
               />
             ))}
           </div>

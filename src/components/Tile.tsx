@@ -17,6 +17,7 @@ interface TileProps {
   deleted: boolean;
   deletedCollapse: boolean;
   deletedScale: boolean;
+  preventClicks: boolean;
   onSelect: (col: number, row: number) => void;
   onHighlightedSelect: (col: number, row: number) => void;
 }
@@ -30,11 +31,12 @@ export default function Tile({
   deleted,
   deletedCollapse,
   deletedScale,
+  preventClicks,
   onSelect,
   onHighlightedSelect,
 }: TileProps) {
   const handleClick = () => {
-    if (deletedCollapse) return;
+    if (preventClicks) return;
     onSelect(col, row);
   };
 
