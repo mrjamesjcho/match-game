@@ -47,8 +47,14 @@ export default function Tile({
     if (highlighted)
       return HighlightedClassname[color as keyof typeof HighlightedClassname];
 
+    if (deleted) {
+      return DeletedClassname[color as keyof typeof DeletedClassname];
+    }
+
     if (deleted && deleteTransition) {
-      return DeleteTransitionClassname[color as keyof typeof DeletedClassname];
+      return DeleteTransitionClassname[
+        color as keyof typeof DeleteTransitionClassname
+      ];
     }
     return BackgroundColor[color as keyof typeof BackgroundColor];
   };
@@ -58,6 +64,6 @@ export default function Tile({
       key={`${col}-${row}`}
       className={getClassName()}
       onClick={highlighted ? handleHighlightedClick : handleClick}
-    >{`${col}-${row}`}</div>
+    ></div>
   );
 }
