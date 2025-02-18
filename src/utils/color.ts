@@ -1,42 +1,51 @@
 import { Gameboard } from '@/types/gameboard';
 
 export enum BackgroundColor {
-  PINK = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-pink-500 tile',
-  CYAN = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-cyan-500 tile',
-  BLUE = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-blue-500 tile',
-  GREEN = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-green-500 tile',
-  // YELLOW = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-yellow-500 tile',
-  PURPLE = 'w-10 h-10 border col-span-1 flex items-center justify-center bg-purple-500 tile',
+  PINK = 'min-h-[40px] flex items-center justify-center bg-pink-500 tile m-1',
+  CYAN = 'min-h-[40px] flex items-center justify-center bg-cyan-500 tile m-1',
+  BLUE = 'min-h-[40px] flex items-center justify-center bg-blue-500 tile m-1',
+  GREEN = 'min-h-[40px] flex items-center justify-center bg-green-500 tile m-1',
+  YELLOW = 'min-h-[40px] flex items-center justify-center bg-yellow-500 tile m-1',
+  PURPLE = 'min-h-[40px] flex items-center justify-center bg-purple-500 tile m-1',
 }
 
 export enum ClickedClassname {
-  PINK = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-pink-500',
-  CYAN = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-cyan-500',
-  BLUE = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-blue-500',
-  GREEN = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-green-500',
-  YELLOW = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-yellow-500',
-  PURPLE = 'w-10 h-10 outline-orange-500 outline-double col-span-1 flex items-center justify-center bg-purple-500',
+  PINK = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-pink-500',
+  CYAN = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-cyan-500',
+  BLUE = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-blue-500',
+  GREEN = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-green-500',
+  YELLOW = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-yellow-500',
+  PURPLE = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-purple-500',
 }
 
 export enum HighlightedClassname {
-  PINK = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-pink-500',
-  CYAN = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-cyan-500',
-  BLUE = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-blue-500',
-  GREEN = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-green-500',
-  YELLOW = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-yellow-500',
-  PURPLE = 'w-10 h-10 outline-orange-500 outline-2 outline-dotted col-span-1 flex items-center justify-center bg-purple-500',
+  PINK = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-pink-500',
+  CYAN = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-cyan-500',
+  BLUE = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-blue-500',
+  GREEN = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-green-500',
+  YELLOW = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-yellow-500',
+  PURPLE = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-purple-500',
 }
 
 export enum DeletedClassname {
-  PINK = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-pink-500',
-  CYAN = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-cyan-500',
-  BLUE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-blue-500',
-  GREEN = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-green-500',
-  YELLOW = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-yellow-500',
-  PURPLE = 'w-10 h-10 blur-sm col-span-1 flex items-center justify-center bg-purple-500',
+  PINK = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-pink-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  CYAN = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-cyan-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  BLUE = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-blue-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  GREEN = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-green-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  YELLOW = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-yellow-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+  PURPLE = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-purple-500 transition-scale delay-300 duration-500 scale-0 ease-in',
 }
 
-export const getRandomBackgroundColor = (
+export enum DeleteTransitionClassname {
+  PINK = 'min-h-0 flex items-center justify-center m-0 bg-pink-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+  CYAN = 'min-h-0 flex items-center justify-center m-0 bg-cyan-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+  BLUE = 'min-h-0 flex items-center justify-center m-0 bg-blue-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+  GREEN = 'min-h-0 flex items-center justify-center m-0 bg-green-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+  YELLOW = 'min-h-0 flex items-center justify-center m-0 bg-yellow-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+  PURPLE = 'min-h-0 flex items-center justify-center m-0 bg-purple-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+}
+
+export const getRandomBackgroundColorWithoutMatches = (
   col: number,
   row: number,
   matrix: Gameboard
@@ -52,6 +61,13 @@ export const getRandomBackgroundColor = (
     prevTwoColorsinRowSame(col, row, matrix, randomKey)
   );
   return randomKey;
+};
+
+export const getRandomBackgroundColor = () => {
+  const keys = Object.keys(BackgroundColor);
+  return keys[
+    Math.floor(Math.random() * keys.length)
+  ] as keyof typeof BackgroundColor;
 };
 
 const prevTwoColorsInColumnSame = (
