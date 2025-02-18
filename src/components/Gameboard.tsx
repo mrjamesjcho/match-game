@@ -1,10 +1,13 @@
 'use client';
 
 import { NUMBER_OF_COLS, NUMBER_OF_ROWS } from '@/config';
-import { useEffect, useState } from 'react';
-import { getRandomBackgroundColor } from '@/utils/color';
-import dynamic from 'next/dynamic';
 import type { Gameboard, Tile, TilePosition } from '@/types/gameboard';
+import {
+  getRandomBackgroundColor,
+  getRandomBackgroundColorWithoutMatches,
+} from '@/utils/color';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
@@ -12,7 +15,8 @@ export default function Gameboard() {
   const [matrix, setMatrix] = useState<Gameboard>([]);
   const [selectedTile, setSelectedTile] = useState<TilePosition | null>(null);
   const [tilesToDelete, setTilesToDelete] = useState<TilePosition[]>([]);
-  const [deleteTransition, setDeleteTransition] = useState(false);
+  const [addNewTiles, setAddNewTiles] = useState(false);
+  const [collapseDeletedTiles, setCollapseDeletedTiles] = useState(false);
   // user selects a tile
   // user selects a highlighted tile
   // check for 3 or more matching tiles in the same row or column
@@ -32,7 +36,7 @@ export default function Gameboard() {
         col.push({
           col: idx,
           row,
-          color: getRandomBackgroundColor(idx, row, newMatrix),
+          color: getRandomBackgroundColorWithoutMatches(idx, row, newMatrix),
           selected: false,
           highlighted: false,
           deleted: false,
@@ -42,70 +46,84 @@ export default function Gameboard() {
     setMatrix(newMatrix);
   }, []);
 
-  const addOrRemoveHighlightedTilesAroundSelected = (
+  const toggleSelectedAndHighlightedTiles = (
     selectedCol: number,
     selectedRow: number,
-    newMatrix: Gameboard
+    gameboard: Gameboard
   ) => {
-    if (selectedCol > 0) {
-      newMatrix[selectedCol - 1][selectedRow].highlighted =
-        !newMatrix[selectedCol - 1][selectedRow].highlighted;
-    }
-    if (selectedCol < NUMBER_OF_COLS - 1) {
-      newMatrix[selectedCol + 1][selectedRow].highlighted =
-        !newMatrix[selectedCol + 1][selectedRow].highlighted;
-    }
-    if (selectedRow > 0) {
-      newMatrix[selectedCol][selectedRow - 1].highlighted =
-        !newMatrix[selectedCol][selectedRow - 1].highlighted;
-    }
-    if (selectedRow < NUMBER_OF_ROWS - 1) {
-      newMatrix[selectedCol][selectedRow + 1].highlighted =
-        !newMatrix[selectedCol][selectedRow + 1].highlighted;
-    }
+    const updatedNewMatrix = gameboard.map((col, colIdx) => {
+      let newCol;
+      // restore selected and highlighted tiles in the same column of the selected tile
+      if (colIdx === selectedCol) {
+        newCol = col.map((tile, rowIdx) => {
+          if (rowIdx === selectedRow) {
+            return { ...tile, selected: !tile.selected };
+          }
+          if (rowIdx === selectedRow + 1) {
+            return { ...tile, highlighted: !tile.highlighted };
+          }
+          if (rowIdx === selectedRow - 1) {
+            return { ...tile, highlighted: !tile.highlighted };
+          }
+          return tile;
+        });
+      }
+
+      // restore highlighted tiles in the same row as the selected tile
+      if (colIdx === selectedCol - 1) {
+        newCol = (newCol ?? col).map((tile, rowIdx) =>
+          rowIdx === selectedRow
+            ? { ...tile, highlighted: !tile.highlighted }
+            : tile
+        );
+      }
+      if (colIdx === selectedCol + 1) {
+        newCol = (newCol ?? col).map((tile, rowIdx) =>
+          rowIdx === selectedRow
+            ? { ...tile, highlighted: !tile.highlighted }
+            : tile
+        );
+      }
+      return newCol ?? col;
+    });
+    return updatedNewMatrix;
   };
 
-  // when user selects a tile, highlight the tiles around the selected tile
-  // if user selects the same tile again, deselect it and restore the highlighted tiles
-  const handleTileSelect = (selectedCol: number, selectedRow: number) => {
-    // update selected attribute of the selected tile
-    const newMatrix = matrix.map((col, colIdx) =>
-      colIdx === selectedCol
-        ? col.map((tile, rowIdx) =>
-            rowIdx === selectedRow
-              ? { ...tile, selected: !tile.selected }
-              : tile
-          )
-        : col
-    );
-    let newSelectedTile: TilePosition | null = {
-      col: selectedCol,
-      row: selectedRow,
-    };
+  // if the user selects a tile, mark the selected tile as selected and highlight the tiles around the selected tile
+  // if a previously selected tile exists, deselect the previously selected tile and restore highlighted tiles
+  // if the user selects the same tile, deselect the selected tile and restore highlighted tiles
+  const handleTileSelect = (newSelectedCol: number, newSelectedRow: number) => {
+    let newGameboard;
 
-    if (
-      selectedTile?.col === selectedCol &&
-      selectedTile?.row === selectedRow
-    ) {
-      // if user selected the same tile again, deselect it
-      newSelectedTile = null;
-    } else if (selectedTile) {
-      // if user selected a different tile
-      // deselect the previously selected tile and restore the highlighted tiles
-      addOrRemoveHighlightedTilesAroundSelected(
-        selectedTile?.col,
-        selectedTile?.row,
-        newMatrix
+    // deselect the previously selected tile and restore highlighted tiles
+    // this also handles the case where the user selects the same previously selected tile
+    if (selectedTile) {
+      newGameboard = toggleSelectedAndHighlightedTiles(
+        selectedTile.col,
+        selectedTile.row,
+        matrix
       );
-      newMatrix[selectedTile.col][selectedTile.row].selected = false;
     }
-    // highlight the tiles around the selected tile and update gameboard
-    addOrRemoveHighlightedTilesAroundSelected(
-      selectedCol,
-      selectedRow,
-      newMatrix
-    );
-    setMatrix(newMatrix);
+
+    // mark the new selected tile as selected and highlight the tiles around the selected tile
+    // if the user did not select the same tile
+    if (
+      selectedTile?.col !== newSelectedCol &&
+      selectedTile?.row !== newSelectedRow
+    ) {
+      newGameboard = toggleSelectedAndHighlightedTiles(
+        newSelectedCol,
+        newSelectedRow,
+        newGameboard ?? matrix
+      );
+    }
+    setMatrix(newGameboard!);
+
+    // update the selected tile with the new selected tile
+    const newSelectedTile: TilePosition | null = {
+      col: newSelectedCol,
+      row: newSelectedRow,
+    };
     setSelectedTile(newSelectedTile);
   };
 
@@ -285,7 +303,7 @@ export default function Gameboard() {
     return [...matchingTilesInSameColumn, ...matchingTilesInSameRow];
   };
 
-  const swapSelectedTileWithHighlightedTile = async (
+  const swapSelectedTileWithHighlightedTile = (
     highlightedCol: number,
     highlightedRow: number
   ) => {
@@ -364,7 +382,7 @@ export default function Gameboard() {
     );
     if (tilesToDelete.length) {
       console.log('three or more matching tiles in the same row or column');
-      await swapSelectedTileWithHighlightedTile(highlightedCol, highlightedRow);
+      swapSelectedTileWithHighlightedTile(highlightedCol, highlightedRow);
       setSelectedTile(null);
       setTilesToDelete(tilesToDelete);
     } else {
@@ -376,8 +394,9 @@ export default function Gameboard() {
 
   // update the gameboard with the tiles to be deleted
   useEffect(() => {
+    console.log('tiles to delete', tilesToDelete);
     if (tilesToDelete.length) {
-      const newMatrix = matrix.map((col, colIdx) => {
+      let newMatrix = matrix.map((col, colIdx) => {
         // update the tiles to be deleted
         let newCol;
         if (tilesToDelete.find((tile) => tile.col === colIdx)) {
@@ -397,26 +416,80 @@ export default function Gameboard() {
         }
         return newCol || col;
       });
+      newMatrix = newMatrix.map((col, colIdx) => {
+        if (col.find((tile) => tile.deleted)) {
+          let tilesRemoved = 0;
+          const newCol = [];
+          for (
+            let rowIdx = 0;
+            rowIdx < NUMBER_OF_ROWS + tilesRemoved;
+            rowIdx++
+          ) {
+            if (rowIdx >= NUMBER_OF_ROWS) {
+              newCol.push({
+                col: colIdx,
+                row: rowIdx - tilesRemoved,
+                color: getRandomBackgroundColor(),
+                selected: false,
+                highlighted: false,
+                deleted: false,
+              });
+              continue;
+            }
+            if (col[rowIdx].deleted) {
+              tilesRemoved++;
+            }
+            if (!col[rowIdx].deleted && tilesRemoved) {
+              newCol.push({
+                ...col[rowIdx],
+                row: col[rowIdx].row - tilesRemoved,
+              });
+            } else {
+              newCol.push(col[rowIdx]);
+            }
+          }
+          return newCol;
+        }
+        return col;
+      });
       setTilesToDelete([]);
       setMatrix(newMatrix);
+      setTimeout(() => {
+        setAddNewTiles(true);
+      }, 1000);
     }
   }, [matrix, tilesToDelete]);
 
   // transition the deleted tiles
   useEffect(() => {
-    if (!tilesToDelete.length) {
-      setDeleteTransition(true);
+    console.log('add new tiles', addNewTiles);
+    if (addNewTiles) {
       setTimeout(() => {
-        setDeleteTransition(false);
+        setAddNewTiles(false);
+        setCollapseDeletedTiles(true);
       }, 2000);
     }
-  }, [tilesToDelete]);
+  }, [matrix, addNewTiles]);
+
+  useEffect(() => {
+    console.log('remove deleted tiles from gameboard', collapseDeletedTiles);
+    if (collapseDeletedTiles) {
+    }
+  }, [collapseDeletedTiles]);
+
+  // transition and remove deleted tiles
+  // append new tiles to the top of the columns
+  // update the deleted tiles to transition to a scale of 0
+  // remove deleted tiles from the gameboard
 
   return (
     <div className="flex w-full h-screen items-center justify-center">
-      <div className="border p-2 flex items-center justify-center grid grid-cols-8 gap-2 min-w-[394px] min-h-[394px]">
+      <div className="border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]">
         {matrix?.map((col: Tile[], idx: number) => (
-          <div key={`col-${idx}`} className="flex flex-col-reverse gap-2">
+          <div
+            key={`col-${idx}`}
+            className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
+          >
             {col.map((cell, row) => (
               <Tile
                 key={`${col}-${row}`}
@@ -428,7 +501,8 @@ export default function Gameboard() {
                 onSelect={handleTileSelect}
                 onHighlightedSelect={handleHighlightedTileSelect}
                 deleted={cell.deleted}
-                deleteTransition={deleteTransition}
+                deletedScale={addNewTiles}
+                deletedCollapse={collapseDeletedTiles}
               />
             ))}
           </div>
