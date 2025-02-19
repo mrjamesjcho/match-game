@@ -9,7 +9,7 @@ export type Tile = {
   deleted: boolean;
 };
 
-export type TilePosition = {
+export type TileCoordinates = {
   col: number;
   row: number;
 };
