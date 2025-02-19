@@ -16,7 +16,6 @@ interface TileProps {
   highlighted: boolean;
   deleted: boolean;
   deletedCollapse: boolean;
-  deletedScale: boolean;
   preventClicks: boolean;
   onSelect: (col: number, row: number) => void;
   onHighlightedSelect: (col: number, row: number) => void;
@@ -30,7 +29,6 @@ export default function Tile({
   highlighted,
   deleted,
   deletedCollapse,
-  deletedScale,
   preventClicks,
   onSelect,
   onHighlightedSelect,
@@ -52,12 +50,13 @@ export default function Tile({
       return HighlightedClassname[color as keyof typeof HighlightedClassname];
 
     if (deleted) {
-      if (deletedCollapse)
-        return DeleteTransitionClassname[
-          color as keyof typeof DeleteTransitionClassname
-        ];
-      if (deletedScale)
-        return DeletedClassname[color as keyof typeof DeletedClassname];
+      return deletedCollapse
+        ? // collapse deleted tiles to 0 after new tiles are added
+          DeleteTransitionClassname[
+            color as keyof typeof DeleteTransitionClassname
+          ]
+        : // scale deleted tiles to 0
+          DeletedClassname[color as keyof typeof DeletedClassname];
     }
 
     return BackgroundColor[color as keyof typeof BackgroundColor];
