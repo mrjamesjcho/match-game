@@ -444,7 +444,7 @@ export default function Gameboard({ menuOpen, theme }: GameboardProps) {
 
   const getClassName = () => {
     return menuOpen
-      ? 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] grayscale blur-sm brightness-50'
+      ? 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] brightness-[15%]'
       : 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]';
   };
 
