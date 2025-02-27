@@ -1,5 +1,5 @@
-import Gameboard from '../components/Gameboard';
+import Container from '@/components/Container';
 
 export default function Home() {
-  return <Gameboard />;
+  return <Container />;
 }

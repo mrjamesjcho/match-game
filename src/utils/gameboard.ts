@@ -85,6 +85,7 @@ export const addNewTiles = (prevGameboard: Gameboard) => {
           continue;
         }
         if (col[rowIdx].deleted) {
+          newCol.push(col[rowIdx]);
           tilesRemoved++;
         } else if (!col[rowIdx].deleted && tilesRemoved) {
           // update rows of tiles not marked to be deleted

@@ -386,18 +386,18 @@ export default function Gameboard() {
         markTilesForDeletion(prevMatrix, tilesToDelete)
       );
       setTilesToDelete([]);
-      setTimeout(() => {
-        setTilesMarkedForDeletion(true);
-      }, 1000);
+      setTilesMarkedForDeletion(true);
     }
   }, [matrix, tilesToDelete]);
 
   // add new tiles to the columns with deleted tiles
   useEffect(() => {
     if (tilesMarkedForDeletion) {
-      setMatrix((prevMatrix) => addNewTiles(prevMatrix));
-      setTilesMarkedForDeletion(false);
-      setNewTilesAdded(true);
+      setTimeout(() => {
+        setMatrix((prevMatrix) => addNewTiles(prevMatrix));
+        setTilesMarkedForDeletion(false);
+        setNewTilesAdded(true);
+      }, 1000);
     }
   }, [matrix, tilesMarkedForDeletion]);
 
@@ -407,7 +407,7 @@ export default function Gameboard() {
       setNewTilesAdded(false);
       setCollapseDeletedTiles(true);
     }
-  }, [newTilesAdded]);
+  }, [matrix, newTilesAdded]);
 
   // remove the deleted tiles from the gameboard
   useEffect(() => {
@@ -418,7 +418,6 @@ export default function Gameboard() {
         const newMatrix = matrix.map((col) =>
           col.filter((tile) => !tile.deleted)
         );
-        console.log(newMatrix);
         setMatrix(newMatrix);
       }, 1000);
     }
@@ -438,31 +437,29 @@ export default function Gameboard() {
   }, [checkForAdditionalMatches, matrix]);
 
   return (
-    <div className="flex w-full h-screen items-center justify-center">
-      <div className="border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]">
-        {matrix?.map((col: Tile[], idx: number) => (
-          <div
-            key={`col-${idx}`}
-            className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
-          >
-            {col.map((cell, row) => (
-              <Tile
-                key={`${col}-${row}`}
-                col={idx}
-                row={row}
-                color={cell.color}
-                selected={cell.selected}
-                highlighted={cell.highlighted}
-                onSelect={handleTileSelect}
-                onHighlightedSelect={handleHighlightedTileSelect}
-                deleted={cell.deleted}
-                deletedCollapse={collapseDeletedTiles}
-                preventClicks={preventClicks}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+    <div className="border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]">
+      {matrix?.map((col: Tile[], idx: number) => (
+        <div
+          key={`col-${idx}`}
+          className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
+        >
+          {col.map((cell, row) => (
+            <Tile
+              key={`${col}-${row}`}
+              col={idx}
+              row={row}
+              color={cell.color}
+              selected={cell.selected}
+              highlighted={cell.highlighted}
+              onSelect={handleTileSelect}
+              onHighlightedSelect={handleHighlightedTileSelect}
+              deleted={cell.deleted}
+              deletedCollapse={collapseDeletedTiles}
+              preventClicks={preventClicks}
+            />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

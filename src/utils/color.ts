@@ -37,12 +37,12 @@ export enum DeletedClassname {
 }
 
 export enum DeleteTransitionClassname {
-  PINK = 'min-h-0 flex items-center justify-center m-0 bg-pink-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  CYAN = 'min-h-0 flex items-center justify-center m-0 bg-cyan-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  BLUE = 'min-h-0 flex items-center justify-center m-0 bg-blue-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  GREEN = 'min-h-0 flex items-center justify-center m-0 bg-green-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  YELLOW = 'min-h-0 flex items-center justify-center m-0 bg-yellow-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  PURPLE = 'min-h-0 flex items-center justify-center m-0 bg-purple-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+  PINK = 'min-h-0 flex items-center justify-center m-0 bg-pink-500 transition-all duration-500 max-h-0 scale-0 ease-in',
+  CYAN = 'min-h-0 flex items-center justify-center m-0 bg-cyan-500 transition-all duration-500 max-h-0 scale-0 ease-in',
+  BLUE = 'min-h-0 flex items-center justify-center m-0 bg-blue-500 transition-all duration-500 max-h-0 scale-0 ease-in',
+  GREEN = 'min-h-0 flex items-center justify-center m-0 bg-green-500 transition-all duration-500 max-h-0 scale-0 ease-in',
+  YELLOW = 'min-h-0 flex items-center justify-center m-0 bg-yellow-500 transition-all duration-500 max-h-0 scale-0 ease-in',
+  PURPLE = 'min-h-0 flex items-center justify-center m-0 bg-purple-500 transition-all duration-500 max-h-0 scale-0 ease-in',
 }
 
 export const getRandomBackgroundColorWithoutMatches = (
