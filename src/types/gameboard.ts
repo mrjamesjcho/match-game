@@ -1,7 +1,7 @@
-import { BackgroundColor } from '@/utils/color';
+import { TileThemeColorNumber } from '@/utils/color';
 
 export type Tile = {
-  color: keyof typeof BackgroundColor;
+  color: TileThemeColorNumber;
   row: number;
   col: number;
   selected: boolean;

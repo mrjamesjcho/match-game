@@ -23,3 +23,20 @@ body {
 .tile:hover {
   opacity: 0.5;
 }
+
+.tile-wrapper {
+  @apply relative overflow-hidden;
+}
+
+.tile-wrapper::before {
+  background: conic-gradient(
+    rgba(244, 114, 182, 0.4) 0deg,
+    rgba(192, 132, 252, 0.4) 0deg,
+    transparent 80deg
+  );
+}
+
+.menu-color-option {
+  min-width: 20px;
+  opacity: 1 !important;
+}

@@ -1,22 +1,17 @@
 'use client';
 
-import {
-  BackgroundColor,
-  ClickedClassname,
-  DeletedClassname,
-  DeleteTransitionClassname,
-  HighlightedClassname,
-} from '@/utils/color';
+import { getThemeClassname, Theme, TileThemeColorNumber } from '@/utils/color';
 
 interface TileProps {
   col: number;
   row: number;
-  color: string;
+  color: TileThemeColorNumber;
   selected: boolean;
   highlighted: boolean;
   deleted: boolean;
   deletedCollapse: boolean;
   preventClicks: boolean;
+  theme: Theme;
   onSelect: (col: number, row: number) => void;
   onHighlightedSelect: (col: number, row: number) => void;
 }
@@ -30,6 +25,7 @@ export default function Tile({
   deleted,
   deletedCollapse,
   preventClicks,
+  theme,
   onSelect,
   onHighlightedSelect,
 }: TileProps) {
@@ -43,23 +39,16 @@ export default function Tile({
   };
 
   const getClassName = () => {
-    if (selected)
-      return ClickedClassname[color as keyof typeof ClickedClassname];
-
-    if (highlighted)
-      return HighlightedClassname[color as keyof typeof HighlightedClassname];
-
-    if (deleted) {
-      return deletedCollapse
-        ? // collapse deleted tiles to 0 after new tiles are added
-          DeleteTransitionClassname[
-            color as keyof typeof DeleteTransitionClassname
-          ]
-        : // scale deleted tiles to 0
-          DeletedClassname[color as keyof typeof DeletedClassname];
-    }
-
-    return BackgroundColor[color as keyof typeof BackgroundColor];
+    const status = selected
+      ? 'SELECTED'
+      : highlighted
+        ? 'HIGHLIGHTED'
+        : deleted && deletedCollapse
+          ? 'COLLAPSED'
+          : deleted
+            ? 'DELETED'
+            : 'INITIAL';
+    return getThemeClassname(theme, status, color);
   };
 
   return (

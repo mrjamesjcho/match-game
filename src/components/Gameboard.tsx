@@ -2,6 +2,7 @@
 
 import { NUMBER_OF_COLS, NUMBER_OF_ROWS } from '@/config';
 import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
+import { Theme } from '@/utils/color';
 import {
   addNewTiles,
   createGameboard,
@@ -13,8 +14,13 @@ import { useEffect, useState } from 'react';
 
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
-export default function Gameboard() {
-  const [matrix, setMatrix] = useState<Gameboard>(createGameboard());
+interface GameboardProps {
+  menuOpen: boolean;
+  theme: Theme;
+}
+
+export default function Gameboard({ menuOpen, theme }: GameboardProps) {
+  const [matrix, setMatrix] = useState<Gameboard>(createGameboard(theme));
   const [selectedTile, setSelectedTile] = useState<TileCoordinates | null>(
     null
   );
@@ -394,12 +400,12 @@ export default function Gameboard() {
   useEffect(() => {
     if (tilesMarkedForDeletion) {
       setTimeout(() => {
-        setMatrix((prevMatrix) => addNewTiles(prevMatrix));
+        setMatrix((prevMatrix) => addNewTiles(prevMatrix, theme));
         setTilesMarkedForDeletion(false);
         setNewTilesAdded(true);
       }, 1000);
     }
-  }, [matrix, tilesMarkedForDeletion]);
+  }, [matrix, tilesMarkedForDeletion, theme]);
 
   // transition the deleted tiles to collapse
   useEffect(() => {
@@ -436,8 +442,14 @@ export default function Gameboard() {
     }
   }, [checkForAdditionalMatches, matrix]);
 
+  const getClassName = () => {
+    return menuOpen
+      ? 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] grayscale blur-sm brightness-50'
+      : 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]';
+  };
+
   return (
-    <div className="border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]">
+    <div className={getClassName()}>
       {matrix?.map((col: Tile[], idx: number) => (
         <div
           key={`col-${idx}`}
@@ -456,6 +468,7 @@ export default function Gameboard() {
               deleted={cell.deleted}
               deletedCollapse={collapseDeletedTiles}
               preventClicks={preventClicks}
+              theme={theme}
             />
           ))}
         </div>

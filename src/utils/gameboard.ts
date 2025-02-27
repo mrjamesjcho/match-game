@@ -2,12 +2,13 @@ import { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
 import {
   getRandomBackgroundColor,
   getRandomBackgroundColorWithoutMatches,
+  Theme,
 } from './color';
 
 const NUMBER_OF_COLS = 8;
 const NUMBER_OF_ROWS = 8;
 
-export const createGameboard = () => {
+export const createGameboard = (theme: Theme) => {
   const newGameboard = Array.from(
     { length: NUMBER_OF_COLS },
     () => [] as Tile[]
@@ -17,7 +18,12 @@ export const createGameboard = () => {
       col.push({
         col: idx,
         row,
-        color: getRandomBackgroundColorWithoutMatches(idx, row, newGameboard),
+        color: getRandomBackgroundColorWithoutMatches(
+          idx,
+          row,
+          newGameboard,
+          theme
+        ),
         selected: false,
         highlighted: false,
         deleted: false,
@@ -53,7 +59,7 @@ export const markTilesForDeletion = (
 };
 
 // add new tiles to the top of the column where tiles were deleted
-export const addNewTiles = (prevGameboard: Gameboard) => {
+export const addNewTiles = (prevGameboard: Gameboard, theme: Theme) => {
   return prevGameboard.map((col, colIdx) => {
     // if a column has tiles marked for deletion
     // - add a new tile to the top of the column for each tile marked for deletion
@@ -68,7 +74,7 @@ export const addNewTiles = (prevGameboard: Gameboard) => {
           // make sure it doesn't match the color of the previous two tiles
           let newColor;
           do {
-            newColor = getRandomBackgroundColor();
+            newColor = getRandomBackgroundColor(theme);
           } while (
             newColor === colorsInNewColumn[colorsInNewColumn.length - 1] &&
             newColor === colorsInNewColumn[colorsInNewColumn.length - 2]
