@@ -1,61 +1,106 @@
 import { Gameboard } from '@/types/gameboard';
 
-export enum BackgroundColor {
-  PINK = 'min-h-[40px] flex items-center justify-center bg-pink-500 tile m-1',
-  CYAN = 'min-h-[40px] flex items-center justify-center bg-cyan-500 tile m-1',
-  BLUE = 'min-h-[40px] flex items-center justify-center bg-blue-500 tile m-1',
-  GREEN = 'min-h-[40px] flex items-center justify-center bg-green-500 tile m-1',
-  YELLOW = 'min-h-[40px] flex items-center justify-center bg-yellow-500 tile m-1',
-  PURPLE = 'min-h-[40px] flex items-center justify-center bg-purple-500 tile m-1',
+export enum Theme {
+  DEFAULT = 'Default',
+  AQUA = 'Aqua',
+  SOLAR = 'Solar',
+  PLUM = 'Plum',
 }
 
-export enum ClickedClassname {
-  PINK = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-pink-500',
-  CYAN = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-cyan-500',
-  BLUE = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-blue-500',
-  GREEN = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-green-500',
-  YELLOW = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-yellow-500',
-  PURPLE = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1 bg-purple-500',
+export type TileStatus =
+  | 'INITIAL'
+  | 'SELECTED'
+  | 'HIGHLIGHTED'
+  | 'DELETED'
+  | 'COLLAPSED';
+
+export enum TileStatusStyle {
+  INITIAL = 'min-h-[40px] flex items-center justify-center tile m-1',
+  SELECTED = 'min-h-[40px] outline-orange-500 outline-double flex items-center justify-center m-1',
+  HIGHLIGHTED = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1',
+  DELETED = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 transition-scale delay-300 duration-500 scale-0 ease-in',
+  COLLAPSED = 'min-h-0 flex items-center justify-center m-0 transition-all duration-500 max-h-0 scale-0 ease-in',
 }
 
-export enum HighlightedClassname {
-  PINK = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-pink-500',
-  CYAN = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-cyan-500',
-  BLUE = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-blue-500',
-  GREEN = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-green-500',
-  YELLOW = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-yellow-500',
-  PURPLE = 'min-h-[40px] outline-orange-500 outline-2 outline-dotted flex items-center justify-center m-1 bg-purple-500',
+export type TileThemeColorNumber =
+  | 'ONE'
+  | 'TWO'
+  | 'THREE'
+  | 'FOUR'
+  | 'FIVE'
+  | 'SIX';
+
+export enum Default {
+  ONE = 'bg-pink-500',
+  TWO = 'bg-cyan-500',
+  THREE = 'bg-blue-500',
+  FOUR = 'bg-green-500',
+  FIVE = 'bg-yellow-500',
+  SIX = 'bg-purple-500',
 }
 
-export enum DeletedClassname {
-  PINK = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-pink-500 transition-scale delay-300 duration-500 scale-0 ease-in',
-  CYAN = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-cyan-500 transition-scale delay-300 duration-500 scale-0 ease-in',
-  BLUE = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-blue-500 transition-scale delay-300 duration-500 scale-0 ease-in',
-  GREEN = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-green-500 transition-scale delay-300 duration-500 scale-0 ease-in',
-  YELLOW = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-yellow-500 transition-scale delay-300 duration-500 scale-0 ease-in',
-  PURPLE = 'min-h-[40px] max-h-[40px] blur-sm flex items-center justify-center m-1 bg-purple-500 transition-scale delay-300 duration-500 scale-0 ease-in',
+export enum Aqua {
+  ONE = 'bg-emerald-400',
+  TWO = 'bg-cyan-300',
+  THREE = 'bg-sky-500',
+  FOUR = 'bg-blue-600',
+  FIVE = 'bg-indigo-500',
+  SIX = 'bg-violet-400',
 }
 
-export enum DeleteTransitionClassname {
-  PINK = 'min-h-0 flex items-center justify-center m-0 bg-pink-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  CYAN = 'min-h-0 flex items-center justify-center m-0 bg-cyan-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  BLUE = 'min-h-0 flex items-center justify-center m-0 bg-blue-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  GREEN = 'min-h-0 flex items-center justify-center m-0 bg-green-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  YELLOW = 'min-h-0 flex items-center justify-center m-0 bg-yellow-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
-  PURPLE = 'min-h-0 flex items-center justify-center m-0 bg-purple-500 transition-max-height duration-500 max-h-0 scale-0 ease-in',
+export enum Solar {
+  ONE = 'bg-red-400',
+  TWO = 'bg-orange-600',
+  THREE = 'bg-amber-500',
+  FOUR = 'bg-yellow-300',
+  FIVE = 'bg-pink-400',
+  SIX = 'bg-rose-600',
 }
+
+export enum Plum {
+  ONE = 'bg-blue-500',
+  TWO = 'bg-indigo-600',
+  THREE = 'bg-violet-500',
+  FOUR = 'bg-purple-700',
+  FIVE = 'bg-fuchsia-500',
+  SIX = 'bg-pink-400',
+}
+
+export const getThemeEnum = (theme: Theme) => {
+  switch (theme) {
+    case Theme.DEFAULT:
+      return Default;
+    case Theme.AQUA:
+      return Aqua;
+    case Theme.SOLAR:
+      return Solar;
+    case Theme.PLUM:
+      return Plum;
+  }
+};
+
+export const getThemeClassname = (
+  theme: Theme,
+  status: TileStatus,
+  colorNumber: TileThemeColorNumber
+) => {
+  const themeEnum = getThemeEnum(theme);
+  return themeEnum[colorNumber] + ' ' + TileStatusStyle[status];
+};
 
 export const getRandomBackgroundColorWithoutMatches = (
   col: number,
   row: number,
-  matrix: Gameboard
+  matrix: Gameboard,
+  theme: Theme
 ) => {
-  const keys = Object.keys(BackgroundColor);
+  const themeEnum = getThemeEnum(theme);
+  const keys = Object.keys(themeEnum);
   let randomKey;
   do {
     randomKey = keys[
       Math.floor(Math.random() * keys.length)
-    ] as keyof typeof BackgroundColor;
+    ] as keyof typeof themeEnum;
   } while (
     prevTwoColorsInColumnSame(col, row, matrix, randomKey) ||
     prevTwoColorsinRowSame(col, row, matrix, randomKey)
@@ -63,18 +108,23 @@ export const getRandomBackgroundColorWithoutMatches = (
   return randomKey;
 };
 
-export const getRandomBackgroundColor = () => {
-  const keys = Object.keys(BackgroundColor);
+export const getRandomBackgroundColor = (theme: Theme) => {
+  const themeEnum = getThemeEnum(theme);
+  const keys = Object.keys(themeEnum);
   return keys[
     Math.floor(Math.random() * keys.length)
-  ] as keyof typeof BackgroundColor;
+  ] as keyof typeof themeEnum;
 };
 
 const prevTwoColorsInColumnSame = (
   col: number,
   row: number,
   matrix: Gameboard,
-  color: keyof typeof BackgroundColor
+  color:
+    | keyof typeof Default
+    | keyof typeof Aqua
+    | keyof typeof Solar
+    | keyof typeof Plum
 ) => {
   if (row < 2) return false;
   return (
@@ -87,7 +137,11 @@ const prevTwoColorsinRowSame = (
   col: number,
   row: number,
   matrix: Gameboard,
-  color: keyof typeof BackgroundColor
+  color:
+    | keyof typeof Default
+    | keyof typeof Aqua
+    | keyof typeof Solar
+    | keyof typeof Plum
 ) => {
   if (col < 2) return false;
   return (

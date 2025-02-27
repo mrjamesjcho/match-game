@@ -2,6 +2,7 @@
 
 import { NUMBER_OF_COLS, NUMBER_OF_ROWS } from '@/config';
 import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
+import { Theme } from '@/utils/color';
 import {
   addNewTiles,
   createGameboard,
@@ -13,8 +14,13 @@ import { useEffect, useState } from 'react';
 
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
-export default function Gameboard() {
-  const [matrix, setMatrix] = useState<Gameboard>(createGameboard());
+interface GameboardProps {
+  menuOpen: boolean;
+  theme: Theme;
+}
+
+export default function Gameboard({ menuOpen, theme }: GameboardProps) {
+  const [matrix, setMatrix] = useState<Gameboard>(createGameboard(theme));
   const [selectedTile, setSelectedTile] = useState<TileCoordinates | null>(
     null
   );
@@ -386,20 +392,20 @@ export default function Gameboard() {
         markTilesForDeletion(prevMatrix, tilesToDelete)
       );
       setTilesToDelete([]);
-      setTimeout(() => {
-        setTilesMarkedForDeletion(true);
-      }, 1000);
+      setTilesMarkedForDeletion(true);
     }
   }, [matrix, tilesToDelete]);
 
   // add new tiles to the columns with deleted tiles
   useEffect(() => {
     if (tilesMarkedForDeletion) {
-      setMatrix((prevMatrix) => addNewTiles(prevMatrix));
-      setTilesMarkedForDeletion(false);
-      setNewTilesAdded(true);
+      setTimeout(() => {
+        setMatrix((prevMatrix) => addNewTiles(prevMatrix, theme));
+        setTilesMarkedForDeletion(false);
+        setNewTilesAdded(true);
+      }, 1000);
     }
-  }, [matrix, tilesMarkedForDeletion]);
+  }, [matrix, tilesMarkedForDeletion, theme]);
 
   // transition the deleted tiles to collapse
   useEffect(() => {
@@ -407,7 +413,7 @@ export default function Gameboard() {
       setNewTilesAdded(false);
       setCollapseDeletedTiles(true);
     }
-  }, [newTilesAdded]);
+  }, [matrix, newTilesAdded]);
 
   // remove the deleted tiles from the gameboard
   useEffect(() => {
@@ -418,7 +424,6 @@ export default function Gameboard() {
         const newMatrix = matrix.map((col) =>
           col.filter((tile) => !tile.deleted)
         );
-        console.log(newMatrix);
         setMatrix(newMatrix);
       }, 1000);
     }
@@ -437,32 +442,37 @@ export default function Gameboard() {
     }
   }, [checkForAdditionalMatches, matrix]);
 
+  const getClassName = () => {
+    return menuOpen
+      ? 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] brightness-[15%]'
+      : 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]';
+  };
+
   return (
-    <div className="flex w-full h-screen items-center justify-center">
-      <div className="border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]">
-        {matrix?.map((col: Tile[], idx: number) => (
-          <div
-            key={`col-${idx}`}
-            className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
-          >
-            {col.map((cell, row) => (
-              <Tile
-                key={`${col}-${row}`}
-                col={idx}
-                row={row}
-                color={cell.color}
-                selected={cell.selected}
-                highlighted={cell.highlighted}
-                onSelect={handleTileSelect}
-                onHighlightedSelect={handleHighlightedTileSelect}
-                deleted={cell.deleted}
-                deletedCollapse={collapseDeletedTiles}
-                preventClicks={preventClicks}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+    <div className={getClassName()}>
+      {matrix?.map((col: Tile[], idx: number) => (
+        <div
+          key={`col-${idx}`}
+          className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
+        >
+          {col.map((cell, row) => (
+            <Tile
+              key={`${col}-${row}`}
+              col={idx}
+              row={row}
+              color={cell.color}
+              selected={cell.selected}
+              highlighted={cell.highlighted}
+              onSelect={handleTileSelect}
+              onHighlightedSelect={handleHighlightedTileSelect}
+              deleted={cell.deleted}
+              deletedCollapse={collapseDeletedTiles}
+              preventClicks={preventClicks}
+              theme={theme}
+            />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
