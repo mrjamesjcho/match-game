@@ -105,9 +105,95 @@ export const addNewTiles = (prevGameboard: Gameboard) => {
   });
 };
 
-export const findTilesToDelete = (
+export const threeOrMoreMatchingTilesInSameRow = (
   gameboard: Gameboard,
-  tilesToDelete: TileCoordinates[]
+  col: number,
+  row: number
 ): TileCoordinates[] => {
-  return [];
+  const matchingTiles: TileCoordinates[] = [];
+  const color = gameboard[col][row].color;
+
+  // check to the left of col
+  let currentCol = col - 1;
+  while (currentCol >= 0 && gameboard[currentCol][row].color === color) {
+    matchingTiles.push({ col: currentCol, row });
+    currentCol--;
+  }
+
+  // check to the right of col
+  currentCol = col + 1;
+  while (
+    currentCol < NUMBER_OF_COLS &&
+    gameboard[currentCol][row].color === color
+  ) {
+    matchingTiles.push({ col: currentCol, row });
+    currentCol++;
+  }
+
+  return matchingTiles.length >= 2 ? matchingTiles.concat({ col, row }) : [];
+};
+
+export const threeOrMoreMatchingTilesInSameColumn = (
+  gameboard: Gameboard,
+  col: number,
+  row: number
+): TileCoordinates[] => {
+  const matchingTiles: TileCoordinates[] = [];
+  const color = gameboard[col][row].color;
+
+  // check below row
+  let currentRow = row - 1;
+  while (currentRow >= 0 && gameboard[col][currentRow].color === color) {
+    matchingTiles.push({ col, row: currentRow });
+    currentRow--;
+  }
+
+  // check above row
+  currentRow = row + 1;
+  while (
+    currentRow < NUMBER_OF_ROWS &&
+    gameboard[col][currentRow].color === color
+  ) {
+    matchingTiles.push({ col, row: currentRow });
+    currentRow++;
+  }
+
+  return matchingTiles.length >= 2 ? matchingTiles.concat({ col, row }) : [];
+};
+
+export const findAdditionalTilesToDelete = (
+  gameboard: Gameboard
+): TileCoordinates[] => {
+  // check every tile on the gameboard for matching tiles in the same row or column
+  // TODO: optimize based on previously deleted tiles
+  const tilesToDelete: TileCoordinates[] = [];
+  gameboard.forEach((col, colIdx) => {
+    col.forEach((_tile, rowIdx) => {
+      const matchingTilesInRow = threeOrMoreMatchingTilesInSameRow(
+        gameboard,
+        colIdx,
+        rowIdx
+      );
+      const matchingTilesInColumn = threeOrMoreMatchingTilesInSameColumn(
+        gameboard,
+        colIdx,
+        rowIdx
+      );
+      if (matchingTilesInRow.length) {
+        tilesToDelete.push(...matchingTilesInRow);
+      }
+      if (matchingTilesInColumn.length) {
+        tilesToDelete.push(...matchingTilesInColumn);
+      }
+    });
+  });
+
+  // remove duplicates and return
+  const tilesToDeleteSet = new Set(
+    tilesToDelete.map((tile) => `${tile.col},${tile.row}`)
+  );
+  return Array.from(tilesToDeleteSet).map((tile) => {
+    const [col, row] = tile.split(',').map(Number);
+    return { col, row };
+  });
 };

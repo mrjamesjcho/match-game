@@ -5,6 +5,7 @@ import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
 import {
   addNewTiles,
   createGameboard,
+  findAdditionalTilesToDelete,
   markTilesForDeletion,
 } from '@/utils/gameboard';
 import dynamic from 'next/dynamic';
@@ -22,6 +23,8 @@ export default function Gameboard() {
   const [tilesMarkedForDeletion, setTilesMarkedForDeletion] = useState(false);
   const [newTilesAdded, setNewTilesAdded] = useState(false);
   const [collapseDeletedTiles, setCollapseDeletedTiles] = useState(false);
+  const [checkForAdditionalMatches, setCheckForAdditionalMatches] =
+    useState(false);
 
   const toggleSelectedAndHighlightedTiles = (
     selectedCol: number,
@@ -277,7 +280,12 @@ export default function Gameboard() {
       highlightedCol,
       highlightedRow
     );
-    return [...matchingTilesInSameColumn, ...matchingTilesInSameRow];
+    const matchingTilesSet = new Set(
+      [...matchingTilesInSameColumn, ...matchingTilesInSameRow].map((t) =>
+        JSON.stringify(t)
+      )
+    );
+    return Array.from(matchingTilesSet).map((t) => JSON.parse(t));
   };
 
   const swapSelectedTileWithHighlightedTile = (
@@ -406,15 +414,28 @@ export default function Gameboard() {
     if (collapseDeletedTiles) {
       setTimeout(() => {
         setCollapseDeletedTiles(false);
+        setCheckForAdditionalMatches(true);
         const newMatrix = matrix.map((col) =>
           col.filter((tile) => !tile.deleted)
         );
         console.log(newMatrix);
         setMatrix(newMatrix);
-        setPreventClicks(false);
       }, 1000);
     }
   }, [collapseDeletedTiles, matrix]);
+
+  // check for additional matches after the deleted tiles are removed
+  useEffect(() => {
+    if (checkForAdditionalMatches) {
+      const additionalTilesToDelete = findAdditionalTilesToDelete(matrix);
+      if (additionalTilesToDelete.length) {
+        setTilesToDelete(additionalTilesToDelete);
+      } else {
+        setPreventClicks(false);
+      }
+      setCheckForAdditionalMatches(false);
+    }
+  }, [checkForAdditionalMatches, matrix]);
 
   return (
     <div className="flex w-full h-screen items-center justify-center">
