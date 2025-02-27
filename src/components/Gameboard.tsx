@@ -1,44 +1,30 @@
 'use client';
 
 import { NUMBER_OF_COLS, NUMBER_OF_ROWS } from '@/config';
-import type { Gameboard, Tile, TilePosition } from '@/types/gameboard';
+import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
 import {
-  getRandomBackgroundColor,
-  getRandomBackgroundColorWithoutMatches,
-} from '@/utils/color';
+  addNewTiles,
+  createGameboard,
+  findAdditionalTilesToDelete,
+  markTilesForDeletion,
+} from '@/utils/gameboard';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
 export default function Gameboard() {
-  const [matrix, setMatrix] = useState<Gameboard>([]);
-  const [selectedTile, setSelectedTile] = useState<TilePosition | null>(null);
+  const [matrix, setMatrix] = useState<Gameboard>(createGameboard());
+  const [selectedTile, setSelectedTile] = useState<TileCoordinates | null>(
+    null
+  );
   const [preventClicks, setPreventClicks] = useState(false);
-  const [tilesToDelete, setTilesToDelete] = useState<TilePosition[]>([]);
+  const [tilesToDelete, setTilesToDelete] = useState<TileCoordinates[]>([]);
+  const [tilesMarkedForDeletion, setTilesMarkedForDeletion] = useState(false);
   const [newTilesAdded, setNewTilesAdded] = useState(false);
-  const [scaleDeletedTiles, setScaleDeletedTiles] = useState(false);
   const [collapseDeletedTiles, setCollapseDeletedTiles] = useState(false);
-
-  useEffect(() => {
-    const newMatrix = Array.from(
-      { length: NUMBER_OF_COLS },
-      () => [] as Tile[]
-    );
-    newMatrix.forEach((col, idx) => {
-      for (let row = 0; row < NUMBER_OF_ROWS; row++) {
-        col.push({
-          col: idx,
-          row,
-          color: getRandomBackgroundColorWithoutMatches(idx, row, newMatrix),
-          selected: false,
-          highlighted: false,
-          deleted: false,
-        });
-      }
-    });
-    setMatrix(newMatrix);
-  }, []);
+  const [checkForAdditionalMatches, setCheckForAdditionalMatches] =
+    useState(false);
 
   const toggleSelectedAndHighlightedTiles = (
     selectedCol: number,
@@ -114,7 +100,7 @@ export default function Gameboard() {
     setMatrix(newGameboard!);
 
     // update the selected tile with the new selected tile
-    const newSelectedTile: TilePosition | null = {
+    const newSelectedTile: TileCoordinates | null = {
       col: newSelectedCol,
       row: newSelectedRow,
     };
@@ -134,7 +120,7 @@ export default function Gameboard() {
     let leftComplete = false;
     let colRight = highlightedCol + 1;
     let rightComplete = false;
-    let matchedTiles1: TilePosition[] = [];
+    let matchedTiles1: TileCoordinates[] = [];
     do {
       if (
         colLeft >= 0 &&
@@ -170,7 +156,7 @@ export default function Gameboard() {
     leftComplete = false;
     colRight = selectedTile.col + 1;
     rightComplete = false;
-    let matchedTiles2: TilePosition[] = [];
+    let matchedTiles2: TileCoordinates[] = [];
     do {
       if (
         colLeft >= 0 &&
@@ -215,7 +201,7 @@ export default function Gameboard() {
     let topComplete = false;
     let rowBottom = highlightedRow + 1;
     let bottomComplete = false;
-    let matchedTiles1: TilePosition[] = [];
+    let matchedTiles1: TileCoordinates[] = [];
     do {
       if (
         rowTop >= 0 &&
@@ -294,7 +280,12 @@ export default function Gameboard() {
       highlightedCol,
       highlightedRow
     );
-    return [...matchingTilesInSameColumn, ...matchingTilesInSameRow];
+    const matchingTilesSet = new Set(
+      [...matchingTilesInSameColumn, ...matchingTilesInSameRow].map((t) =>
+        JSON.stringify(t)
+      )
+    );
+    return Array.from(matchingTilesSet).map((t) => JSON.parse(t));
   };
 
   const swapSelectedTileWithHighlightedTile = (
@@ -389,104 +380,62 @@ export default function Gameboard() {
   };
 
   // update the gameboard by marking the tiles to be deleted
-  // and adding new tiles to the columns with deleted tiles
   useEffect(() => {
     if (tilesToDelete.length) {
-      // mark tiles to be deleted
-      let newMatrix = matrix.map((col, colIdx) => {
-        let newCol;
-        if (tilesToDelete.find((tile) => tile.col === colIdx)) {
-          newCol = (newCol ?? col).map((tile, rowIdx) => {
-            if (
-              tilesToDelete.find(
-                (tile) => tile.col === colIdx && tile.row === rowIdx
-              )
-            ) {
-              return {
-                ...tile,
-                deleted: true,
-              };
-            }
-            return tile;
-          });
-        }
-        return newCol || col;
-      });
-
-      // add new tiles to the columns with deleted tiles
-      newMatrix = newMatrix.map((col, colIdx) => {
-        if (col.find((tile) => tile.deleted)) {
-          let tilesRemoved = 0;
-          const newCol = [];
-          for (
-            let rowIdx = 0;
-            rowIdx < NUMBER_OF_ROWS + tilesRemoved;
-            rowIdx++
-          ) {
-            if (rowIdx >= NUMBER_OF_ROWS) {
-              newCol.push({
-                col: colIdx,
-                row: rowIdx - tilesRemoved,
-                color: getRandomBackgroundColor(),
-                selected: false,
-                highlighted: false,
-                deleted: false,
-              });
-              continue;
-            }
-            if (col[rowIdx].deleted) {
-              tilesRemoved++;
-            }
-            if (!col[rowIdx].deleted && tilesRemoved) {
-              newCol.push({
-                ...col[rowIdx],
-                row: col[rowIdx].row - tilesRemoved,
-              });
-            } else {
-              newCol.push(col[rowIdx]);
-            }
-          }
-          return newCol;
-        }
-        return col;
-      });
+      setMatrix((prevMatrix) =>
+        markTilesForDeletion(prevMatrix, tilesToDelete)
+      );
       setTilesToDelete([]);
-      setMatrix(newMatrix);
-      setNewTilesAdded(true);
+      setTimeout(() => {
+        setTilesMarkedForDeletion(true);
+      }, 1000);
     }
   }, [matrix, tilesToDelete]);
 
-  // transition the deleted tiles to scale to 0
+  // add new tiles to the columns with deleted tiles
   useEffect(() => {
-    if (newTilesAdded) {
-      setNewTilesAdded(false);
-      setScaleDeletedTiles(true);
+    if (tilesMarkedForDeletion) {
+      setMatrix((prevMatrix) => addNewTiles(prevMatrix));
+      setTilesMarkedForDeletion(false);
+      setNewTilesAdded(true);
     }
-  }, [newTilesAdded]);
+  }, [matrix, tilesMarkedForDeletion]);
 
   // transition the deleted tiles to collapse
   useEffect(() => {
-    if (scaleDeletedTiles) {
-      setTimeout(() => {
-        setScaleDeletedTiles(false);
-        setCollapseDeletedTiles(true);
-      }, 1000);
+    if (newTilesAdded) {
+      setNewTilesAdded(false);
+      setCollapseDeletedTiles(true);
     }
-  }, [scaleDeletedTiles]);
+  }, [newTilesAdded]);
 
   // remove the deleted tiles from the gameboard
   useEffect(() => {
     if (collapseDeletedTiles) {
       setTimeout(() => {
         setCollapseDeletedTiles(false);
+        setCheckForAdditionalMatches(true);
         const newMatrix = matrix.map((col) =>
           col.filter((tile) => !tile.deleted)
         );
+        console.log(newMatrix);
         setMatrix(newMatrix);
-        setPreventClicks(false);
       }, 1000);
     }
   }, [collapseDeletedTiles, matrix]);
+
+  // check for additional matches after the deleted tiles are removed
+  useEffect(() => {
+    if (checkForAdditionalMatches) {
+      const additionalTilesToDelete = findAdditionalTilesToDelete(matrix);
+      if (additionalTilesToDelete.length) {
+        setTilesToDelete(additionalTilesToDelete);
+      } else {
+        setPreventClicks(false);
+      }
+      setCheckForAdditionalMatches(false);
+    }
+  }, [checkForAdditionalMatches, matrix]);
 
   return (
     <div className="flex w-full h-screen items-center justify-center">
@@ -507,7 +456,6 @@ export default function Gameboard() {
                 onSelect={handleTileSelect}
                 onHighlightedSelect={handleHighlightedTileSelect}
                 deleted={cell.deleted}
-                deletedScale={scaleDeletedTiles}
                 deletedCollapse={collapseDeletedTiles}
                 preventClicks={preventClicks}
               />
