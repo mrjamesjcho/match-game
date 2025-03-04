@@ -1,6 +1,11 @@
 'use client';
 
-import { getThemeClassname, Theme, TileThemeColorNumber } from '@/utils/color';
+import {
+  getThemeClassname,
+  getWrapperStyle,
+  Theme,
+  TileThemeColorNumber,
+} from '@/utils/color';
 
 interface TileProps {
   col: number;
@@ -52,13 +57,12 @@ export default function Tile({
   };
 
   const getWrapperClassName = () => {
-    if (highlighted) {
-      return 'tile-wrapper min-h-[44px] min-w-[44px] flex items-center justify-center m-[2px] z-0';
-    }
-    if (deleted && deletedCollapse) {
-      return 'min-h-0 max-h-0 min-w-[44px] flex items-center justify-center m-0 transition-all duration-500 max-h-0 scale-0 ease-in z-0';
-    }
-    return 'min-h-[44px] min-w-[44px] flex items-center justify-center m-[2px] z-0';
+    const status = highlighted
+      ? 'HIGHLIGHTED'
+      : deleted && deletedCollapse
+        ? 'COLLAPSED'
+        : 'INITIAL';
+    return getWrapperStyle(status);
   };
 
   return (

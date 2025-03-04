@@ -14,12 +14,20 @@ export type TileStatus =
   | 'DELETED'
   | 'COLLAPSED';
 
+export type TileWrapperStatus = 'INITIAL' | 'HIGHLIGHTED' | 'COLLAPSED';
+
 export enum TileStatusStyle {
   INITIAL = 'min-h-[40px] min-w-[40px] flex items-center justify-center tile z-20',
   SELECTED = 'min-h-[40px] min-w-[40px] outline-orange-500 outline-double flex items-center justify-center z-20',
   HIGHLIGHTED = 'min-h-[40px] min-w-[40px] flex items-center justify-center z-20',
   DELETED = 'min-h-[40px] max-h-[40px] min-w-[40px] blur-sm flex items-center justify-center transition-scale delay-300 duration-500 scale-0 ease-in z-20',
   COLLAPSED = 'min-h-0 max-h-0  min-w-[40px] flex items-center justify-center m-0 transition-all duration-500 max-h-0 scale-0 ease-in z-20',
+}
+
+export enum TileWrapperStatusStyle {
+  INITIAL = 'min-h-[44px] min-w-[44px] flex items-center justify-center m-[2px] z-0',
+  HIGHLIGHTED = 'tile-wrapper min-h-[44px] min-w-[44px] flex items-center justify-center m-[2px] z-0',
+  COLLAPSED = 'min-h-0 max-h-0 min-w-[44px] flex items-center justify-center m-0 transition-all duration-500 max-h-0 scale-0 ease-in z-0',
 }
 
 export type TileThemeColorNumber =
@@ -86,6 +94,10 @@ export const getThemeClassname = (
 ) => {
   const themeEnum = getThemeEnum(theme);
   return themeEnum[colorNumber] + ' ' + TileStatusStyle[status];
+};
+
+export const getWrapperStyle = (status: TileWrapperStatus) => {
+  return TileWrapperStatusStyle[status];
 };
 
 export const getRandomBackgroundColorWithoutMatches = (
