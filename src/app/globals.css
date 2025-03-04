@@ -30,10 +30,12 @@ body {
 
 .tile-wrapper::before {
   background: conic-gradient(
-    rgba(244, 114, 182, 0.4) 0deg,
-    rgba(192, 132, 252, 0.4) 0deg,
-    transparent 80deg
+    #00ff0d 0deg,
+    rgb(0, 255, 21) 0deg,
+    transparent 500deg
   );
+
+  @apply absolute left-[-25%] top-[-25%] h-[150%] w-[150%] animate-border-spin content-[''];
 }
 
 .menu-color-option {

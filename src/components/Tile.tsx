@@ -1,6 +1,11 @@
 'use client';
 
-import { getThemeClassname, Theme, TileThemeColorNumber } from '@/utils/color';
+import {
+  getThemeClassname,
+  getWrapperStyle,
+  Theme,
+  TileThemeColorNumber,
+} from '@/utils/color';
 
 interface TileProps {
   col: number;
@@ -51,11 +56,22 @@ export default function Tile({
     return getThemeClassname(theme, status, color);
   };
 
+  const getWrapperClassName = () => {
+    const status = highlighted
+      ? 'HIGHLIGHTED'
+      : deleted && deletedCollapse
+        ? 'COLLAPSED'
+        : 'INITIAL';
+    return getWrapperStyle(status);
+  };
+
   return (
-    <div
-      key={`${col}-${row}`}
-      className={getClassName()}
-      onClick={highlighted ? handleHighlightedClick : handleClick}
-    ></div>
+    <div className={getWrapperClassName()}>
+      <div
+        key={`${col}-${row}`}
+        className={getClassName()}
+        onClick={highlighted ? handleHighlightedClick : handleClick}
+      ></div>
+    </div>
   );
 }
