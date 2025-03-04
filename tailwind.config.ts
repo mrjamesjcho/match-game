@@ -21,7 +21,7 @@ export default {
         },
       },
       animation: {
-        spin: 'border-spin 2s linear infinite',
+        'border-spin': 'border-spin 1.5s linear infinite',
       },
     },
   },

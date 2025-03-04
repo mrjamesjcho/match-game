@@ -51,11 +51,23 @@ export default function Tile({
     return getThemeClassname(theme, status, color);
   };
 
+  const getWrapperClassName = () => {
+    if (highlighted) {
+      return 'tile-wrapper min-h-[44px] min-w-[44px] flex items-center justify-center m-[2px] z-0';
+    }
+    if (deleted && deletedCollapse) {
+      return 'min-h-0 max-h-0 min-w-[44px] flex items-center justify-center m-0 transition-all duration-500 max-h-0 scale-0 ease-in z-0';
+    }
+    return 'min-h-[44px] min-w-[44px] flex items-center justify-center m-[2px] z-0';
+  };
+
   return (
-    <div
-      key={`${col}-${row}`}
-      className={getClassName()}
-      onClick={highlighted ? handleHighlightedClick : handleClick}
-    ></div>
+    <div className={getWrapperClassName()}>
+      <div
+        key={`${col}-${row}`}
+        className={getClassName()}
+        onClick={highlighted ? handleHighlightedClick : handleClick}
+      ></div>
+    </div>
   );
 }
