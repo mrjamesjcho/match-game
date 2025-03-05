@@ -8,6 +8,7 @@ import {
   createGameboard,
   findAdditionalTilesToDelete,
   markTilesForDeletion,
+  toggleSelectedAndHighlightedTiles,
 } from '@/utils/gameboard';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
@@ -32,85 +33,21 @@ export default function Gameboard({ menuOpen, theme }: GameboardProps) {
   const [checkForAdditionalMatches, setCheckForAdditionalMatches] =
     useState(false);
 
-  const toggleSelectedAndHighlightedTiles = (
-    selectedCol: number,
-    selectedRow: number,
-    gameboard: Gameboard
-  ) => {
-    const updatedNewMatrix = gameboard.map((col, colIdx) => {
-      let newCol;
-      // restore selected and highlighted tiles in the same column of the selected tile
-      if (colIdx === selectedCol) {
-        newCol = col.map((tile, rowIdx) => {
-          if (rowIdx === selectedRow) {
-            return { ...tile, selected: !tile.selected };
-          }
-          if (rowIdx === selectedRow + 1) {
-            return { ...tile, highlighted: !tile.highlighted };
-          }
-          if (rowIdx === selectedRow - 1) {
-            return { ...tile, highlighted: !tile.highlighted };
-          }
-          return tile;
-        });
-      }
-
-      // restore highlighted tiles in the same row as the selected tile
-      if (colIdx === selectedCol - 1) {
-        newCol = (newCol ?? col).map((tile, rowIdx) =>
-          rowIdx === selectedRow
-            ? { ...tile, highlighted: !tile.highlighted }
-            : tile
-        );
-      }
-      if (colIdx === selectedCol + 1) {
-        newCol = (newCol ?? col).map((tile, rowIdx) =>
-          rowIdx === selectedRow
-            ? { ...tile, highlighted: !tile.highlighted }
-            : tile
-        );
-      }
-      return newCol ?? col;
-    });
-    return updatedNewMatrix;
-  };
-
   // if the user selects a tile, mark the selected tile as selected and highlight the tiles around the selected tile
-  // if a previously selected tile exists, deselect the previously selected tile and restore highlighted tiles
   // if the user selects the same tile, deselect the selected tile and restore highlighted tiles
   const handleTileSelect = (newSelectedCol: number, newSelectedRow: number) => {
-    let newGameboard;
-
-    // deselect the previously selected tile and restore highlighted tiles
-    // this also handles the case where the user selects the same previously selected tile
+    const newMatrix = toggleSelectedAndHighlightedTiles(
+      newSelectedCol,
+      newSelectedRow,
+      matrix,
+      selectedTile ? false : true
+    );
     if (selectedTile) {
-      newGameboard = toggleSelectedAndHighlightedTiles(
-        selectedTile.col,
-        selectedTile.row,
-        matrix
-      );
+      setSelectedTile(null);
+    } else {
+      setSelectedTile({ col: newSelectedCol, row: newSelectedRow });
     }
-
-    // mark the new selected tile as selected and highlight the tiles around the selected tile
-    // if the user did not select the same tile
-    if (
-      selectedTile?.col !== newSelectedCol &&
-      selectedTile?.row !== newSelectedRow
-    ) {
-      newGameboard = toggleSelectedAndHighlightedTiles(
-        newSelectedCol,
-        newSelectedRow,
-        newGameboard ?? matrix
-      );
-    }
-    setMatrix(newGameboard!);
-
-    // update the selected tile with the new selected tile
-    const newSelectedTile: TileCoordinates | null = {
-      col: newSelectedCol,
-      row: newSelectedRow,
-    };
-    setSelectedTile(newSelectedTile);
+    setMatrix(newMatrix);
   };
 
   // checks if there will be 3 or more tiles connected in the same row to the selected tile

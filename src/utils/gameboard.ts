@@ -8,6 +8,8 @@ import {
 const NUMBER_OF_COLS = 8;
 const NUMBER_OF_ROWS = 8;
 
+// initialize gameboard with random colors
+// no three or more matching tiles in the same row or column
 export const createGameboard = (theme: Theme) => {
   const newGameboard = Array.from(
     { length: NUMBER_OF_COLS },
@@ -31,6 +33,52 @@ export const createGameboard = (theme: Theme) => {
     }
   });
   return newGameboard;
+};
+
+// set or restore selected and highlighted tiles
+export const toggleSelectedAndHighlightedTiles = (
+  selectedCol: number,
+  selectedRow: number,
+  gameboard: Gameboard,
+  toggleValue: boolean
+) => {
+  const updatedNewMatrix = gameboard.map((col, colIdx) => {
+    let newCol;
+    if (colIdx === selectedCol) {
+      newCol = col.map((tile, rowIdx) => {
+        if (rowIdx === selectedRow) {
+          return { ...tile, selected: toggleValue };
+        }
+        if (rowIdx === selectedRow + 1) {
+          return { ...tile, highlighted: toggleValue, selected: false };
+        }
+        if (rowIdx === selectedRow - 1) {
+          return { ...tile, highlighted: toggleValue, selected: false };
+        }
+        return { ...tile, highlighted: false, selected: false };
+      });
+    } else if (colIdx === selectedCol - 1) {
+      newCol = col.map((tile, rowIdx) =>
+        rowIdx === selectedRow
+          ? { ...tile, highlighted: toggleValue, selected: false }
+          : { ...tile, highlighted: false, selected: false }
+      );
+    } else if (colIdx === selectedCol + 1) {
+      newCol = col.map((tile, rowIdx) =>
+        rowIdx === selectedRow
+          ? { ...tile, highlighted: toggleValue, selected: false }
+          : { ...tile, highlighted: false, selected: false }
+      );
+    } else {
+      newCol = col.map((tile) => ({
+        ...tile,
+        highlighted: false,
+        selected: false,
+      }));
+    }
+    return newCol ?? col;
+  });
+  return updatedNewMatrix;
 };
 
 export const markTilesForDeletion = (
