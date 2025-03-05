@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Gameboard from './Gameboard';
 import Menu from './Menu';
 import { Theme } from '@/utils/color';
+import Score from './Score';
 
 export default function Container() {
   const [menuOpen, setMenuOpen] = useState<'help' | 'settings' | null>(null);
@@ -22,6 +23,7 @@ export default function Container() {
         onThemeSelect={setTheme}
       />
       <Gameboard menuOpen={menuOpen !== null} theme={theme} />
+      <Score score={1234} highscore={9999} />
     </div>
   );
 }
