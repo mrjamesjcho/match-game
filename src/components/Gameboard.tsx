@@ -4,6 +4,7 @@ import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
 import { Theme } from '@/utils/color';
 import {
   addNewTiles,
+  calculatePoints,
   createGameboard,
   findAdditionalTilesToDelete,
   markTilesForDeletion,
@@ -12,16 +13,23 @@ import {
   toggleSelectedAndHighlightedTiles,
 } from '@/utils/gameboard';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
 interface GameboardProps {
   menuOpen: boolean;
   theme: Theme;
+  onScoreUpdate: React.Dispatch<React.SetStateAction<number>>;
+  onHighScoreUpdate: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function Gameboard({ menuOpen, theme }: GameboardProps) {
+export default function Gameboard({
+  menuOpen,
+  theme,
+  onHighScoreUpdate,
+  onScoreUpdate,
+}: GameboardProps) {
   const [matrix, setMatrix] = useState<Gameboard>(createGameboard(theme));
   const [selectedTile, setSelectedTile] = useState<TileCoordinates | null>(
     null
@@ -87,10 +95,15 @@ export default function Gameboard({ menuOpen, theme }: GameboardProps) {
       setMatrix((prevMatrix) =>
         markTilesForDeletion(prevMatrix, tilesToDelete)
       );
+      setTimeout(() => {
+        onScoreUpdate(
+          (prevScore) => prevScore + calculatePoints(matrix, tilesToDelete)
+        );
+      }, 1500);
       setTilesToDelete([]);
       setTilesMarkedForDeletion(true);
     }
-  }, [matrix, tilesToDelete]);
+  }, [matrix, onScoreUpdate, tilesToDelete]);
 
   // add new tiles to the columns with deleted tiles
   useEffect(() => {

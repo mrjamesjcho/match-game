@@ -9,6 +9,8 @@ import Score from './Score';
 export default function Container() {
   const [menuOpen, setMenuOpen] = useState<'help' | 'settings' | null>(null);
   const [theme, setTheme] = useState<Theme>(Theme.DEFAULT);
+  const [score, setScore] = useState(0);
+  const [highscore, setHighscore] = useState(0);
 
   const handleMenuClick = (menu: 'help' | 'settings' | null) => {
     setMenuOpen(menu);
@@ -22,8 +24,13 @@ export default function Container() {
         onClick={handleMenuClick}
         onThemeSelect={setTheme}
       />
-      <Gameboard menuOpen={menuOpen !== null} theme={theme} />
-      <Score score={1234} highscore={9999} />
+      <Gameboard
+        menuOpen={menuOpen !== null}
+        theme={theme}
+        onScoreUpdate={setScore}
+        onHighScoreUpdate={setHighscore}
+      />
+      <Score score={score} highscore={highscore} />
     </div>
   );
 }

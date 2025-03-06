@@ -241,6 +241,21 @@ export const markTilesForDeletion = (
   });
 };
 
+export const calculatePoints = (
+  gameboard: Gameboard,
+  tilesToDelete: TileCoordinates[]
+) => {
+  const colorMap: Partial<Record<TileThemeColorNumber, number>> = {};
+  tilesToDelete.forEach(({ col, row }) => {
+    const color = gameboard[col][row].color;
+    colorMap[color] = colorMap[color] ? colorMap[color] + 1 : 1;
+  });
+  return Object.keys(colorMap).reduce((acc, color) => {
+    const colorCount = colorMap[color as TileThemeColorNumber] as number;
+    return acc + 3 + (colorCount % 3) * 2;
+  }, 0);
+};
+
 // add new tiles to the top of the column where tiles were deleted
 export const addNewTiles = (prevGameboard: Gameboard, theme: Theme) => {
   return prevGameboard.map((col, colIdx) => {
