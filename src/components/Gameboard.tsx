@@ -3,6 +3,7 @@
 import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
 import { Theme } from '@/utils/color';
 import {
+  additionalMovesPossible,
   addNewTiles,
   calculatePoints,
   createGameboard,
@@ -21,7 +22,7 @@ interface GameboardProps {
   menuOpen: boolean;
   theme: Theme;
   onScoreUpdate: React.Dispatch<React.SetStateAction<number>>;
-  onHighScoreUpdate: React.Dispatch<React.SetStateAction<number>>;
+  onHighScoreUpdate: () => void;
 }
 
 export default function Gameboard({
@@ -41,6 +42,7 @@ export default function Gameboard({
   const [collapseDeletedTiles, setCollapseDeletedTiles] = useState(false);
   const [checkForAdditionalMatches, setCheckForAdditionalMatches] =
     useState(false);
+  const [checkForAdditionalMoves, setCheckForAdditionalMoves] = useState(false);
 
   // if the user selects a tile, mark the selected tile as selected and highlight the tiles around the selected tile
   // if the user selects the same tile, deselect the selected tile and restore highlighted tiles
@@ -145,11 +147,24 @@ export default function Gameboard({
       if (additionalTilesToDelete.length) {
         setTilesToDelete(additionalTilesToDelete);
       } else {
-        setPreventClicks(false);
+        setCheckForAdditionalMoves(true);
       }
       setCheckForAdditionalMatches(false);
     }
   }, [checkForAdditionalMatches, matrix]);
+
+  // check for additional moves after no more tiles can be deleted
+  useEffect(() => {
+    if (checkForAdditionalMoves) {
+      if (additionalMovesPossible(matrix)) {
+        setPreventClicks(false);
+      } else {
+        console.log('No more moves possible');
+        onHighScoreUpdate();
+      }
+      setCheckForAdditionalMoves(false);
+    }
+  }, [checkForAdditionalMoves, matrix, onHighScoreUpdate]);
 
   const getClassName = () => {
     return menuOpen

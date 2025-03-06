@@ -16,6 +16,12 @@ export default function Container() {
     setMenuOpen(menu);
   };
 
+  const handleUpdateHighscore = () => {
+    if (score > highscore) {
+      setHighscore(score);
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-screen items-center justify-center">
       <Menu
@@ -28,7 +34,7 @@ export default function Container() {
         menuOpen={menuOpen !== null}
         theme={theme}
         onScoreUpdate={setScore}
-        onHighScoreUpdate={setHighscore}
+        onHighScoreUpdate={handleUpdateHighscore}
       />
       <Score score={score} highscore={highscore} />
     </div>
