@@ -15,6 +15,7 @@ import {
 } from '@/utils/gameboard';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
+import Gameover from './Gameover';
 
 const Tile = dynamic(() => import('./Tile'), { ssr: false });
 
@@ -43,6 +44,7 @@ export default function Gameboard({
   const [checkForAdditionalMatches, setCheckForAdditionalMatches] =
     useState(false);
   const [checkForAdditionalMoves, setCheckForAdditionalMoves] = useState(false);
+  const [gameover, setGameover] = useState(true);
 
   // if the user selects a tile, mark the selected tile as selected and highlight the tiles around the selected tile
   // if the user selects the same tile, deselect the selected tile and restore highlighted tiles
@@ -89,6 +91,12 @@ export default function Gameboard({
       );
       setPreventClicks(false);
     }
+  };
+
+  const handleResetGame = () => {
+    setMatrix(createGameboard(theme));
+    setGameover(false);
+    setPreventClicks(false);
   };
 
   // update the gameboard by marking the tiles to be deleted
@@ -161,42 +169,46 @@ export default function Gameboard({
       } else {
         console.log('No more moves possible');
         onHighScoreUpdate();
+        setGameover(true);
       }
       setCheckForAdditionalMoves(false);
     }
   }, [checkForAdditionalMoves, matrix, onHighScoreUpdate]);
 
   const getClassName = () => {
-    return menuOpen
+    return menuOpen || gameover
       ? 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] brightness-[15%]'
       : 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]';
   };
 
   return (
-    <div className={getClassName()}>
-      {matrix?.map((col: Tile[], idx: number) => (
-        <div
-          key={`col-${idx}`}
-          className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
-        >
-          {col.map((cell, row) => (
-            <Tile
-              key={`${col}-${row}`}
-              col={idx}
-              row={row}
-              color={cell.color}
-              selected={cell.selected}
-              highlighted={cell.highlighted}
-              onSelect={handleTileSelect}
-              onHighlightedSelect={handleHighlightedTileSelect}
-              deleted={cell.deleted}
-              deletedCollapse={collapseDeletedTiles}
-              preventClicks={preventClicks}
-              theme={theme}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
+    <>
+      <div className={getClassName()}>
+        {matrix?.map((col: Tile[], idx: number) => (
+          <div
+            key={`col-${idx}`}
+            className="flex flex-col-reverse max-h-[384.4px] overflow-hidden"
+          >
+            {col.map((cell, row) => (
+              <Tile
+                key={`${col}-${row}`}
+                col={idx}
+                row={row}
+                color={cell.color}
+                selected={cell.selected}
+                highlighted={cell.highlighted}
+                onSelect={handleTileSelect}
+                onHighlightedSelect={handleHighlightedTileSelect}
+                deleted={cell.deleted}
+                deletedCollapse={collapseDeletedTiles}
+                preventClicks={preventClicks}
+                theme={theme}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      {gameover && !menuOpen && <Gameover onPlayAgainClick={handleResetGame} />}
+    </>
   );
 }
