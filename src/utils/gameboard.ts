@@ -95,7 +95,7 @@ export const threeOrMoreMatchingTilesInSameRow = (
   while (
     currentCol >= 0 &&
     gameboard[currentCol][tile.row].color === colorToMatch &&
-    (!boundryColumn || currentCol !== boundryColumn)
+    (boundryColumn === undefined || currentCol !== boundryColumn)
   ) {
     matchingTiles.push({ col: currentCol, row: tile.row });
     currentCol--;
@@ -106,7 +106,7 @@ export const threeOrMoreMatchingTilesInSameRow = (
   while (
     currentCol < NUMBER_OF_COLS &&
     gameboard[currentCol][tile.row].color === colorToMatch &&
-    (!boundryColumn || currentCol !== boundryColumn)
+    (boundryColumn === undefined || currentCol !== boundryColumn)
   ) {
     matchingTiles.push({ col: currentCol, row: tile.row });
     currentCol++;
@@ -131,7 +131,7 @@ export const threeOrMoreMatchingTilesInSameColumn = (
   while (
     currentRow >= 0 &&
     gameboard[tile.col][currentRow].color === colorToMatch &&
-    (!boundryRow || currentRow !== boundryRow)
+    (boundryRow === undefined || currentRow !== boundryRow)
   ) {
     matchingTiles.push({ col: tile.col, row: currentRow });
     currentRow--;
@@ -142,7 +142,7 @@ export const threeOrMoreMatchingTilesInSameColumn = (
   while (
     currentRow < NUMBER_OF_ROWS &&
     gameboard[tile.col][currentRow].color === colorToMatch &&
-    (!boundryRow || currentRow !== boundryRow)
+    (boundryRow === undefined || currentRow !== boundryRow)
   ) {
     matchingTiles.push({ col: tile.col, row: currentRow });
     currentRow++;
@@ -343,4 +343,71 @@ export const findAdditionalTilesToDelete = (
     const [col, row] = tile.split(',').map(Number);
     return { col, row };
   });
+};
+
+// check every tile on the gameboard to see if there would be 3 or more matching tiles in
+// the same row or column if the tile was selected and swapped with an adjacent tile
+export const additionalMovesPossible = (gameboard: Gameboard) => {
+  for (let colIdx = 0; colIdx < NUMBER_OF_COLS; colIdx++) {
+    for (let rowIdx = 0; rowIdx < NUMBER_OF_ROWS; rowIdx++) {
+      const selectedTile = { col: colIdx, row: rowIdx };
+
+      // check if swapped with tile to the left
+      if (colIdx > 0) {
+        const highlightedTile = { col: colIdx - 1, row: rowIdx };
+        const matchingTiles =
+          tilesWithThreeOrMoreMatchingTilesInSameColumnOrRowIfSelectedAndHightlightedSwap(
+            gameboard,
+            selectedTile,
+            highlightedTile
+          );
+        if (matchingTiles.length) {
+          return true;
+        }
+      }
+
+      // check if swapped with tile to the right
+      if (colIdx < NUMBER_OF_COLS - 1) {
+        const highlightedTile = { col: colIdx + 1, row: rowIdx };
+        const matchingTiles =
+          tilesWithThreeOrMoreMatchingTilesInSameColumnOrRowIfSelectedAndHightlightedSwap(
+            gameboard,
+            selectedTile,
+            highlightedTile
+          );
+        if (matchingTiles.length) {
+          return true;
+        }
+      }
+
+      // check if swapped with tile below
+      if (rowIdx > 0) {
+        const highlightedTile = { col: colIdx, row: rowIdx - 1 };
+        const matchingTiles =
+          tilesWithThreeOrMoreMatchingTilesInSameColumnOrRowIfSelectedAndHightlightedSwap(
+            gameboard,
+            selectedTile,
+            highlightedTile
+          );
+        if (matchingTiles.length) {
+          return true;
+        }
+      }
+
+      // check if swapped with tile above
+      if (rowIdx < NUMBER_OF_ROWS - 1) {
+        const highlightedTile = { col: colIdx, row: rowIdx + 1 };
+        const matchingTiles =
+          tilesWithThreeOrMoreMatchingTilesInSameColumnOrRowIfSelectedAndHightlightedSwap(
+            gameboard,
+            selectedTile,
+            highlightedTile
+          );
+        if (matchingTiles.length) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 };

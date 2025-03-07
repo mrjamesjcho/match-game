@@ -37,7 +37,7 @@ export default function Settings({ theme, onThemeSelect }: SettingsProps) {
       );
     });
   return (
-    <div className="absolute min-w-[394px] min-h-[394px] z-40 translate-y-[20px] p-4">
+    <div className="absolute min-w-[394px] min-h-[394px] z-40 p-4">
       {renderMenu()}
     </div>
   );
