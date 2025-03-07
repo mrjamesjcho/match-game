@@ -44,7 +44,7 @@ export default function Gameboard({
   const [checkForAdditionalMatches, setCheckForAdditionalMatches] =
     useState(false);
   const [checkForAdditionalMoves, setCheckForAdditionalMoves] = useState(false);
-  const [gameover, setGameover] = useState(true);
+  const [gameover, setGameover] = useState(false);
 
   // if the user selects a tile, mark the selected tile as selected and highlight the tiles around the selected tile
   // if the user selects the same tile, deselect the selected tile and restore highlighted tiles
