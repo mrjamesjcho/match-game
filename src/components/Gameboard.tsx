@@ -95,6 +95,7 @@ export default function Gameboard({
 
   const handleResetGame = () => {
     setMatrix(createGameboard(theme));
+    onScoreUpdate(0);
     setGameover(false);
     setPreventClicks(false);
   };
