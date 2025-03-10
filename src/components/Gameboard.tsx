@@ -1,7 +1,6 @@
 'use client';
 
 import type { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
-import { Theme } from '@/utils/color';
 import {
   additionalMovesPossible,
   addNewTiles,
@@ -13,6 +12,7 @@ import {
   tilesWithThreeOrMoreMatchingTilesInSameColumnOrRowIfSelectedAndHightlightedSwap,
   toggleSelectedAndHighlightedTiles,
 } from '@/utils/gameboard';
+import { GameboardStyle, Theme } from '@/utils/style';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import Gameover from './Gameover';
@@ -62,6 +62,9 @@ export default function Gameboard({
     setMatrix(newMatrix);
   };
 
+  // if the user selects a highlighted tile, check if there are 3 or more matching tiles in the same row or column if the selected tile moves to the highlighted tile's position
+  // if there are, swap the selected tile with the highlighted tile
+  // if there are not, do not swap the tiles
   const handleHighlightedTileSelect = async (
     highlightedCol: number,
     highlightedRow: number
@@ -91,13 +94,6 @@ export default function Gameboard({
       );
       setPreventClicks(false);
     }
-  };
-
-  const handleResetGame = () => {
-    setMatrix(createGameboard(theme));
-    onScoreUpdate(0);
-    setGameover(false);
-    setPreventClicks(false);
   };
 
   // update the gameboard by marking the tiles to be deleted
@@ -176,10 +172,18 @@ export default function Gameboard({
     }
   }, [checkForAdditionalMoves, matrix, onHighScoreUpdate]);
 
+  // reset the gameboard
+  const handleResetGame = () => {
+    setMatrix(createGameboard(theme));
+    onScoreUpdate(0);
+    setGameover(false);
+    setPreventClicks(false);
+  };
+
   const getClassName = () => {
     return menuOpen || gameover
-      ? 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] brightness-[15%]'
-      : 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]';
+      ? GameboardStyle.DIMMED
+      : GameboardStyle.DEFAULT;
   };
 
   return (

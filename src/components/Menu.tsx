@@ -1,8 +1,8 @@
+import { Theme } from '@/utils/style';
 import { faGear, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Rules from './Rules';
 import Settings from './Settings';
-import { Theme } from '@/utils/color';
 
 interface MenuProps {
   open: 'help' | 'settings' | null;

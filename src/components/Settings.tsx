@@ -1,4 +1,4 @@
-import { getThemeEnum, Theme } from '@/utils/color';
+import { getThemeEnum, Theme } from '@/utils/style';
 
 interface SettingsProps {
   theme: Theme;

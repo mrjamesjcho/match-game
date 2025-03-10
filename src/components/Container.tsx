@@ -1,9 +1,9 @@
 'use client';
 
+import { Theme } from '@/utils/style';
 import { useState } from 'react';
 import Gameboard from './Gameboard';
 import Menu from './Menu';
-import { Theme } from '@/utils/color';
 import Score from './Score';
 
 export default function Container() {

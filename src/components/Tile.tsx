@@ -5,7 +5,7 @@ import {
   getWrapperStyle,
   Theme,
   TileThemeColorNumber,
-} from '@/utils/color';
+} from '@/utils/style';
 
 interface TileProps {
   col: number;

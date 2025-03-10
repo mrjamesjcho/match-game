@@ -1,5 +1,10 @@
 import { Gameboard } from '@/types/gameboard';
 
+export enum GameboardStyle {
+  DEFAULT = 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px]',
+  DIMMED = 'border p-1 grid grid-cols-8 min-w-[394px] min-h-[394px] brightness-[15%]',
+}
+
 export enum Theme {
   DEFAULT = 'Default',
   AQUA = 'Aqua',
