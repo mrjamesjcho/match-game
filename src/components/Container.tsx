@@ -12,10 +12,6 @@ export default function Container() {
   const [score, setScore] = useState(0);
   const [highscore, setHighscore] = useState(0);
 
-  const handleMenuClick = (menu: 'help' | 'settings' | null) => {
-    setMenuOpen(menu);
-  };
-
   const handleUpdateHighscore = () => {
     if (score > highscore) {
       setHighscore(score);
@@ -25,9 +21,9 @@ export default function Container() {
   return (
     <div className="flex flex-col w-full h-screen items-center justify-center">
       <Menu
-        open={menuOpen}
+        menuOpen={menuOpen}
         theme={theme}
-        onClick={handleMenuClick}
+        onClick={setMenuOpen}
         onThemeSelect={setTheme}
       />
       <Gameboard

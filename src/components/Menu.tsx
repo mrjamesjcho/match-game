@@ -1,54 +1,52 @@
-import { Theme } from '@/utils/style';
+import { MenuIconStyle, Theme } from '@/utils/style';
 import { faGear, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Rules from './Rules';
 import Settings from './Settings';
+import React from 'react';
 
 interface MenuProps {
-  open: 'help' | 'settings' | null;
+  menuOpen: 'help' | 'settings' | null;
   theme: Theme;
-  onClick: (menu: 'help' | 'settings' | null) => void;
-  onThemeSelect: (theme: Theme) => void;
+  onClick: React.Dispatch<React.SetStateAction<'help' | 'settings' | null>>;
+  onThemeSelect: React.Dispatch<React.SetStateAction<Theme>>;
 }
 
 export default function Menu({
-  open,
+  menuOpen,
   theme,
   onClick,
   onThemeSelect,
 }: MenuProps) {
-  const getIconClassname = (menu: 'help' | 'settings') => {
-    if (menu === 'help') {
-      return open === 'help'
-        ? 'h-[20px] mr-4 cursor-pointer brightness-100'
-        : 'h-[20px] mr-4 cursor-pointer brightness-50 hover:brightness-100 duration-2000';
-    }
-    return open === 'settings'
-      ? 'h-[20px] cursor-pointer brightness-100'
-      : 'h-[20px] cursor-pointer brightness-50 hover:brightness-100 duration-200';
+  const getHelpIconClassname = () => {
+    return menuOpen === 'help' ? MenuIconStyle.OPEN : MenuIconStyle.CLOSED;
+  };
+
+  const getSettingsIconClassname = () => {
+    return menuOpen === 'settings' ? MenuIconStyle.OPEN : MenuIconStyle.CLOSED;
   };
 
   return (
     <>
       <div className="flex justify-between min-w-[394px] min-h-fit p-2">
         <div className="font-bold">Matchy Matchy</div>
-        <div className="flex items-center">
+        <div className="flex items-center justify-between min-w-[50px]">
           <FontAwesomeIcon
-            className={getIconClassname('help')}
+            className={getHelpIconClassname()}
             icon={faQuestion}
-            onClick={() => onClick(open === 'help' ? null : 'help')}
+            onClick={() => onClick(menuOpen === 'help' ? null : 'help')}
           />
           <FontAwesomeIcon
-            className={getIconClassname('settings')}
+            className={getSettingsIconClassname()}
             icon={faGear}
-            onClick={() => onClick(open === 'settings' ? null : 'settings')}
+            onClick={() => onClick(menuOpen === 'settings' ? null : 'settings')}
           />
         </div>
       </div>
-      {open === 'settings' && (
+      {menuOpen === 'settings' && (
         <Settings theme={theme} onThemeSelect={onThemeSelect} />
       )}
-      {open === 'help' && <Rules />}
+      {menuOpen === 'help' && <Rules />}
     </>
   );
 }
