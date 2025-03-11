@@ -1,13 +1,11 @@
+import { NUMBER_OF_COLS, NUMBER_OF_ROWS } from '@/config';
 import { Gameboard, Tile, TileCoordinates } from '@/types/gameboard';
 import {
   getRandomBackgroundColor,
   getRandomBackgroundColorWithoutMatches,
   Theme,
   TileThemeColorNumber,
-} from './color';
-
-const NUMBER_OF_COLS = 8;
-const NUMBER_OF_ROWS = 8;
+} from './style';
 
 // initialize gameboard with random colors
 // no three or more matching tiles in the same row or column

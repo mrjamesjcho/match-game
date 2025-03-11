@@ -1,4 +1,4 @@
-import { TileThemeColorNumber } from '@/utils/color';
+import { TileThemeColorNumber } from '@/utils/style';
 
 export type Tile = {
   color: TileThemeColorNumber;
